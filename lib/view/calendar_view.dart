@@ -1,12 +1,10 @@
 import 'dart:collection';
-import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sea_mates/data/shift.dart';
 import 'package:sea_mates/data/sync_status.dart';
+import 'package:sea_mates/view/shift_add_view.dart';
 import 'package:table_calendar/table_calendar.dart';
-
 
 class CalendarView extends StatefulWidget {
   @override
@@ -16,43 +14,27 @@ class CalendarView extends StatefulWidget {
 class _CalendarState extends State<CalendarView> {
   final List<Shift> shifts = <Shift>[
     Shift(
-        1,
-        DateTime(2021, 5, 1),
-        DateTime(2021, 5, 2),
-        DateTime(2021, 5, 17),
-        DateTime(2021, 5, 19),
-        SyncStatus.SYNC,
+      1,
+      DateTime(2021, 5, 1),
+      DateTime(2021, 5, 2),
+      DateTime(2021, 5, 17),
+      DateTime(2021, 5, 19),
+      SyncStatus.SYNC,
     ),
-    Shift(
-        2,
-        DateTime(2021, 6, 1),
-        DateTime(2021, 6, 2),
-        DateTime(2021, 6, 17),
-        DateTime(2021, 6, 19),
-        SyncStatus.SYNC
-    )
+    Shift(2, DateTime(2021, 6, 1), DateTime(2021, 6, 2), DateTime(2021, 6, 17),
+        DateTime(2021, 6, 19), SyncStatus.SYNC)
   ];
 
-  final unavailabilityStartDates = new LinkedHashSet<DateTime>(
-    equals: isSameDay,
-    hashCode: getHashCode
-  );
-  final unavailabilityEndDates = new LinkedHashSet<DateTime>(
-    equals: isSameDay,
-    hashCode: getHashCode
-  );
-  final boardingDates = new LinkedHashSet<DateTime>(
-    equals: isSameDay,
-    hashCode: getHashCode
-  );
-  final leavingDates = new LinkedHashSet<DateTime>(
-    equals: isSameDay,
-    hashCode: getHashCode
-  );
-  final unavailableDates = new LinkedHashSet<DateTime>(
-    equals: isSameDay,
-    hashCode: getHashCode
-  );
+  final unavailabilityStartDates =
+      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: getHashCode);
+  final unavailabilityEndDates =
+      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: getHashCode);
+  final boardingDates =
+      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: getHashCode);
+  final leavingDates =
+      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: getHashCode);
+  final unavailableDates =
+      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: getHashCode);
 
   @override
   void initState() {
@@ -74,52 +56,67 @@ class _CalendarState extends State<CalendarView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Scrollbar(child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TableCalendar(
-              calendarBuilders: CalendarBuilders(
-                  prioritizedBuilder: (context, DateTime day, focusedDay) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        CustomScrollView(
+          shrinkWrap: true,
+          slivers: [
+            SliverAppBar(
+              automaticallyImplyLeading: false,
+              title: Text('Calendar'),
+              pinned: true,
+            ),
+            SliverList(
+                delegate: SliverChildBuilderDelegate((context, int index) {
+              return TableCalendar(
+                  calendarBuilders: CalendarBuilders(
+                      prioritizedBuilder: (context, DateTime day, focusedDay) {
                     Color color = Colors.white;
                     if (unavailabilityStartDates.contains(day)) {
-                      color =  Colors.amber;
+                      color = Colors.amber;
                     } else if (boardingDates.contains(day)) {
-                      color =  Colors.red;
+                      color = Colors.red;
                     } else if (unavailableDates.contains(day)) {
-                      color =  Colors.grey;
+                      color = Colors.grey;
                     } else if (unavailabilityEndDates.contains(day)) {
-                      color =  Colors.cyan;
+                      color = Colors.cyan;
                     } else if (leavingDates.contains(day)) {
-                      color =  Colors.greenAccent;
+                      color = Colors.greenAccent;
                     }
                     return Container(
                       alignment: Alignment.topCenter,
                       decoration: BoxDecoration(color: color),
                       child: Text(day.day.toString()),
                     );
-                  }
-              ),
-              focusedDay: DateTime.now(),
-              firstDay: DateTime.now().subtract(Duration(days: 2000)),
-              lastDay: DateTime.now().add(Duration(days: 2000))
+                  }),
+                  focusedDay: DateTime.now(),
+                  firstDay: DateTime.now().subtract(Duration(days: 2000)),
+                  lastDay: DateTime.now().add(Duration(days: 2000)));
+            }, childCount: 1))
+          ],
+        ),
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: FloatingActionButton(
+            tooltip: "Shift",
+            child: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ShiftAddView()));
+            },
           ),
-          SizedBox(height: 20,),
-          FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: () {
-                // TODO - addshifts
-              }
-          )
-
-        ],
-      ),
-      )
+        )
+      ],
     );
   }
 }
 
 int getHashCode(DateTime key) {
-  return key.day * 1000000 + key.month * 10000 + key.year;
+  int result = 17;
+  result = 31 * result + key.day;
+  result = 31 * result + key.month;
+  result = 31 * result + key.year;
+  return result;
 }
-

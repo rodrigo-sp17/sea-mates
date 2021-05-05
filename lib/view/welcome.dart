@@ -1,89 +1,88 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sea_mates/view/home.dart';
 import 'package:sea_mates/view/login.dart';
 
 class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        backgroundColor: Colors.white,
+        body: Scrollbar(
+            child: ListView(
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
           children: [
             SizedBox(
-              height: 120,
-              child: Text('Logo placeholder') ,),
-            SizedBox(height: 15,),
+              height: 220,
+              child: Text('Logo placeholder'),
+            ),
+            SizedBox(
+              height: 15,
+            ),
             ElevatedButton(
-                onPressed: (){
+                onPressed: () {
                   // retrieve info, send to endpoint to process
                   // go to socialSignup
                   // or save token
                 },
-                child: Text("Continue with Facebook")
+                child: Text("Continue with Facebook")),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Login()));
+                },
+                child: Text("Login")),
+            Divider(
+              height: 20,
+              thickness: 2,
             ),
             ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Login()));
-                },
-                child: Text("Login")
-            ),
-            Divider(height: 20, thickness: 2,),
-            ElevatedButton(
-                onPressed: (){
                   // push signup
                 },
-                child: Text("Signup")
+                child: Text("Signup")),
+            Divider(
+              height: 20,
+              thickness: 2,
             ),
-            Divider(height: 20, thickness: 2,),
             ElevatedButton(
-                onPressed: (){
+                onPressed: () {
                   // notify user about later sync possibilities
                   // notify about friends not available while offline
                   showDialog(
                       context: context,
                       builder: (_) => AlertDialog(
-                        title: Text("Enter without login"),
-                        content: SingleChildScrollView(
-                          child: Text(
-                              'You are now going in anonymous mode.\n'
+                            title: Text("Entering as Anonymous"),
+                            content: SingleChildScrollView(
+                              child: Text(
+                                  'You are now going in anonymous mode.\n\n'
                                   'In this mode, you will not be able to:\n'
-                                  '- Add friends\m'
+                                  '- Add friends\n'
                                   '- View friends shifts\n'
                                   '- Invite friends to events\n'
-                                  '- Sync with the cloud\n'
+                                  '- Sync with the cloud\n\n'
                                   'However, don\'t worry!\n'
-                                  'You can add an account later and sync your shifts! :)'
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: Text('Cancel'),
-                          ),
-                          TextButton(
-                              onPressed: () {
-                                // push to home with offline user
-                              },
-                              child: Text('Got ya!')
-                          )
-                        ],
-                      ));
+                                  'You can add an account later and sync your shifts! :)'),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: Text('Cancel'),
+                              ),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => HomePage()));
+                                  },
+                                  child: Text('Got ya!'))
+                            ],
+                          ));
                   // push anonymous
                 },
-                child: Text("Continue offline")
-            )
+                child: Text("Continue offline"))
           ],
-        ),
-      )
-    );
+        )));
   }
-
 }
