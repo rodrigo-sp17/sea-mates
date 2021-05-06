@@ -1,8 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:sea_mates/data/shift.dart';
+import 'package:sea_mates/model/shift_list_model.dart';
 
 class ShiftAddView extends StatelessWidget {
   @override
@@ -24,6 +25,8 @@ class ShiftForm extends StatefulWidget {
 }
 
 class _ShiftFormState extends State<StatefulWidget> {
+  Shift _shift = new Shift();
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   FocusNode _unStartDate,
       _boardDate,
@@ -250,12 +253,13 @@ class _ShiftFormState extends State<StatefulWidget> {
     }
   }
 
-  void _handleSubmit() {
-    log('submitted');
+  void _handleSubmit() async {
     // Submission logic, including decision about local vs remote saving
     final form = _formKey.currentState;
     if (form.validate()) {
-      log('fields are valid');
+      _formKey.currentState.save();
+      await Provider.of<ShiftListModel>(context, listen: false).add(_shift);
+      Navigator.pop(context);
     }
   }
 
@@ -290,7 +294,9 @@ class _ShiftFormState extends State<StatefulWidget> {
                 onTap: () {
                   _pickDate(_unStartDateController);
                 },
-                onSaved: (value) {}),
+                onSaved: (value) {
+                  _shift.unavailabilityStartDate = _parseDate(value);
+                }),
             sizedBox,
             TextFormField(
                 textAlignVertical: TextAlignVertical.center,
@@ -307,7 +313,9 @@ class _ShiftFormState extends State<StatefulWidget> {
                 onTap: () {
                   _pickDate(_boardDateController);
                 },
-                onSaved: (value) {}),
+                onSaved: (value) {
+                  _shift.boardingDate = _parseDate(value);
+                }),
             SizedBox(
               height: 15,
             ),
@@ -344,7 +352,9 @@ class _ShiftFormState extends State<StatefulWidget> {
                       onFieldSubmitted: (_) {
                         _calculateCycle();
                       },
-                      onSaved: (value) {},
+                      onSaved: (value) {
+                        _shift.cycleDays = int.parse(value);
+                      },
                     ))
               ],
             ),
@@ -365,7 +375,9 @@ class _ShiftFormState extends State<StatefulWidget> {
                 onTap: () {
                   _pickDate(_leaveDateController);
                 },
-                onSaved: (value) {}),
+                onSaved: (value) {
+                  _shift.leavingDate = _parseDate(value);
+                }),
             sizedBox,
             TextFormField(
                 textAlignVertical: TextAlignVertical.center,
@@ -383,7 +395,9 @@ class _ShiftFormState extends State<StatefulWidget> {
                 onTap: () {
                   _pickDate(_unEndDateController);
                 },
-                onSaved: (value) {}),
+                onSaved: (value) {
+                  _shift.unavailabilityEndDate = _parseDate(value);
+                }),
             sizedBox,
             TextFormField(
                 textAlignVertical: TextAlignVertical.center,
@@ -399,7 +413,9 @@ class _ShiftFormState extends State<StatefulWidget> {
                     suffixText: "x"),
                 validator: _validateRepeat,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                onSaved: (value) {}),
+                onSaved: (value) {
+                  _shift.repeat = int.parse(value);
+                }),
             SizedBox(
               height: 20,
             ),
