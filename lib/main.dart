@@ -4,7 +4,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/shift.dart';
 import 'package:sea_mates/data/sync_status.dart';
-import 'package:sea_mates/repository/impl/shifts_repository_impl.dart';
+import 'package:sea_mates/model/user_model.dart';
+import 'package:sea_mates/repository/impl/shift_hive_repository.dart';
+import 'package:sea_mates/repository/impl/shift_web_client.dart';
+import 'package:sea_mates/repository/impl/user_hive_repo.dart';
 import 'package:sea_mates/view/welcome.dart';
 
 import 'model/shift_list_model.dart';
@@ -20,8 +23,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-        create: (context) => ShiftListModel(ShiftsRepositoryImpl()),
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => UserModel(UserHiveRepository()),
+          ),
+          ProxyProvider<UserModel, ShiftListModel>(
+              update: (context, UserModel uModel, ShiftListModel sModel) =>
+                  ShiftListModel(
+                      ShiftWebClient(), ShiftHiveRepository(), uModel)),
+        ],
         child: MaterialApp(
             title: 'Flutter Demo',
             theme: ThemeData(

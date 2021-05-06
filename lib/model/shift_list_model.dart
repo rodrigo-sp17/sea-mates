@@ -4,14 +4,20 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:sea_mates/data/shift.dart';
 import 'package:sea_mates/data/sync_status.dart';
-import 'package:sea_mates/repository/shifts_repository.dart';
+import 'package:sea_mates/model/user_model.dart';
+import 'package:sea_mates/repository/shift_local_repository.dart';
+import 'package:sea_mates/repository/shift_remote_repository.dart';
 
 class ShiftListModel extends ChangeNotifier {
-  final ShiftsRepository shiftsRepository;
+  final ShiftRemoteRepository shiftRemoteRepository;
+  final ShiftLocalRepository shiftLocalRepository;
+  final UserModel userModel;
 
   List<Shift> _shifts;
 
-  ShiftListModel(this.shiftsRepository, {List<Shift>? shifts})
+  ShiftListModel(
+      this.shiftRemoteRepository, this.shiftLocalRepository, this.userModel,
+      {List<Shift>? shifts})
       : _shifts = shifts ?? [];
 
   Future<UnmodifiableListView<Shift>> get shifts async =>
@@ -20,8 +26,14 @@ class ShiftListModel extends ChangeNotifier {
   /// Syncs shifts
   /// To be called at app initialization and upon user request
   Future syncShifts() async {
-    var localShifts = await shiftsRepository.loadLocal();
-    var remoteShifts = await shiftsRepository.loadRemote();
+    if (!userModel.hasAuthentication()) {
+      return Future.error(
+          "Synchronization is only possible when authenticated");
+    }
+    var token = userModel.getToken();
+
+    var localShifts = await shiftLocalRepository.loadLocal();
+    var remoteShifts = await shiftRemoteRepository.loadRemote(token);
 
     var unsyncedShifts = <Shift>[];
     localShifts.forEach((shift) {
@@ -31,19 +43,20 @@ class ShiftListModel extends ChangeNotifier {
     });
 
     // Replaces local data for remote data
-    await shiftsRepository.removeLocal(localShifts.map((s) => s.id!));
-    await shiftsRepository.saveLocal(remoteShifts);
+    await shiftLocalRepository.removeLocal(localShifts.map((s) => s.id!));
+    await shiftLocalRepository.saveLocal(remoteShifts);
 
     // Adds pending shifts to the server
-    List<Shift> added =
-        await shiftsRepository.addRemote(unsyncedShifts).catchError((e) {
+    List<Shift> added = await shiftRemoteRepository
+        .addRemote(unsyncedShifts, token)
+        .catchError((e) {
       // avoids losing the unsynced ones
-      shiftsRepository.addLocal(unsyncedShifts);
+      shiftLocalRepository.addLocal(unsyncedShifts);
       throw e;
     });
 
-    await shiftsRepository.addLocal(added);
-    _shifts = await shiftsRepository.loadLocal();
+    await shiftLocalRepository.addLocal(added);
+    _shifts = await shiftLocalRepository.loadLocal();
     notifyListeners();
   }
 
@@ -51,15 +64,16 @@ class ShiftListModel extends ChangeNotifier {
   /// Syncs only upon user request
   Future<void> add(Shift shift) async {
     shift.syncStatus = SyncStatus.UNSYNC;
-    var addedShift =
-        await shiftsRepository.addLocal([shift]).then((value) => value.first);
+    var addedShift = await shiftLocalRepository
+        .addLocal([shift]).then((value) => value.first);
     _shifts.add(addedShift);
     notifyListeners();
   }
 
   /// Removes a shift
-  /// Syncs the deletion immediately
+  /// Attempts remote deletions as soon as possible
   Future<void> remove(Set<int> indexes) async {
+    var token = userModel.getToken();
     List<int> synced = [], unsynced = [];
     indexes.forEach((index) {
       var shift = _shifts.elementAt(index);
@@ -68,35 +82,20 @@ class ShiftListModel extends ChangeNotifier {
     });
 
     // for un-synced
-    bool changed = false;
     if (unsynced.isNotEmpty) {
-      await shiftsRepository.removeLocal(unsynced);
-      changed = true;
-    }
-
-    if (synced.isNotEmpty) {
-      await shiftsRepository.removeRemote(synced).catchError((e) => throw e);
-      await shiftsRepository.removeLocal(synced);
-      changed = true;
-    }
-
-    if (changed) {
-      _shifts = await shiftsRepository.loadLocal();
+      await shiftLocalRepository.removeLocal(unsynced);
+      _shifts = await shiftLocalRepository.loadLocal();
       notifyListeners();
     }
 
-    // for sync
-    // if offline
-    // return
-    // attempt batch delete on security workflow
-    // if false, check reason
-    // if timeout, start offline workflow. return error timeout
-    // if any other, display to the user, return error reason
-    // if any deletion succeeds, notify
+    // for synced - requires online access
+    if (synced.isNotEmpty && userModel.hasAuthentication()) {
+      await shiftRemoteRepository
+          .removeRemote(synced, token)
+          .catchError((e) => throw e);
+      await shiftLocalRepository.removeLocal(synced);
+      _shifts = await shiftLocalRepository.loadLocal();
+      notifyListeners();
+    }
   }
-}
-
-class OperationException implements Exception {
-  String message;
-  OperationException(this.message);
 }

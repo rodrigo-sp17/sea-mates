@@ -1,13 +1,13 @@
 import 'package:hive/hive.dart';
 import 'package:sea_mates/data/shift.dart';
-import 'package:sea_mates/repository/shift_repository.dart';
+import 'package:sea_mates/repository/shift_local_repository.dart';
 
-class ShiftsLocalRepositoryImpl implements ShiftRepository {
+class ShiftHiveRepository implements ShiftLocalRepository {
   final String _boxName = "shiftsBox";
   // TODO - convert to widget, close box on exit
 
   @override
-  Future<List<Shift>> addAll(Iterable<Shift> shifts) async {
+  Future<List<Shift>> addLocal(Iterable<Shift> shifts) async {
     var box = await Hive.openBox(_boxName);
     List<Shift> result = [];
     for (Shift s in shifts) {
@@ -19,7 +19,7 @@ class ShiftsLocalRepositoryImpl implements ShiftRepository {
   }
 
   @override
-  Future<List<Shift>> loadShifts() async {
+  Future<List<Shift>> loadLocal() async {
     var box = await Hive.openBox(_boxName);
     // Ensures key to id conversion
     List<Shift> shifts = [];
@@ -31,14 +31,14 @@ class ShiftsLocalRepositoryImpl implements ShiftRepository {
   }
 
   @override
-  Future<int> removeAll(Iterable<int> shiftIds) async {
+  Future<int> removeLocal(Iterable<int> shiftIds) async {
     var box = await Hive.openBox(_boxName);
     await box.deleteAll(shiftIds);
     return shiftIds.length;
   }
 
   @override
-  Future<List<Shift>> saveAll(Iterable<Shift> shifts) async {
+  Future<List<Shift>> saveLocal(Iterable<Shift> shifts) async {
     var box = await Hive.openBox(_boxName);
     shifts.forEach((element) => box.put(element.id, element));
     var result = shifts.map((e) => box.get(e.id) as Shift).toList();
