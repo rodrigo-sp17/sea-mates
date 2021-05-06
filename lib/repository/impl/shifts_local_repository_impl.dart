@@ -4,9 +4,10 @@ import 'package:sea_mates/repository/shift_repository.dart';
 
 class ShiftsLocalRepositoryImpl implements ShiftRepository {
   final String _boxName = "shiftsBox";
+  // TODO - convert to widget, close box on exit
 
   @override
-  Future<List<Shift>> addAll(List<Shift> shifts) async {
+  Future<List<Shift>> addAll(Iterable<Shift> shifts) async {
     var box = await Hive.openBox(_boxName);
     List<Shift> result = [];
     for (Shift s in shifts) {
@@ -30,17 +31,17 @@ class ShiftsLocalRepositoryImpl implements ShiftRepository {
   }
 
   @override
-  Future<int> removeAll(List<int> shiftIds) async {
+  Future<int> removeAll(Iterable<int> shiftIds) async {
     var box = await Hive.openBox(_boxName);
     await box.deleteAll(shiftIds);
     return shiftIds.length;
   }
 
   @override
-  Future<List<Shift>> saveAll(List<Shift> shifts) async {
+  Future<List<Shift>> saveAll(Iterable<Shift> shifts) async {
     var box = await Hive.openBox(_boxName);
     shifts.forEach((element) => box.put(element.id, element));
-    var result = shifts.map((e) => box.get(e.id));
+    var result = shifts.map((e) => box.get(e.id) as Shift).toList();
     return result;
   }
 }

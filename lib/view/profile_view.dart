@@ -12,7 +12,7 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   bool submitting = false;
   bool editing = false;
-  List<Widget> actions;
+  List<Widget> actions = [];
 
   final usernameRegexp = RegExp(r"^[a-zA-Z0-9]+([_@#&-]?[a-zA-Z0-9 ])*$");
   final nameRegexp = RegExp(r"^([^0-9{}\\/()\]\[]*)$");
@@ -24,7 +24,6 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   void initState() {
     super.initState();
-    actions = [];
     _usernameController.text = "username";
     _nameController.text = "Name Surname";
     _emailController.text = "email@domain.com";
@@ -38,7 +37,10 @@ class _ProfileViewState extends State<ProfileView> {
     super.dispose();
   }
 
-  String _validateUsername(String value) {
+  String? _validateUsername(String? value) {
+    if (value == null || value.isEmpty) {
+      return "Username is mandatory";
+    }
     int size = value.length;
     if (size < 6 || size > 30) {
       return "Username must be between 6 and 30 characters";
@@ -49,7 +51,10 @@ class _ProfileViewState extends State<ProfileView> {
     return null;
   }
 
-  String _validateName(String value) {
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return "Name is mandatory";
+    }
     int size = value.length;
     if (size > 60) {
       return "Names should be 60 characters or less";
@@ -60,7 +65,10 @@ class _ProfileViewState extends State<ProfileView> {
     return null;
   }
 
-  String _validateEmail(String value) {
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return "Email is mandatory";
+    }
     if (!EmailValidator.validate(value)) {
       return "Invalid email";
     }
@@ -68,9 +76,9 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   void _editValue(
-      TextEditingController ctrl, Function(String) validator) async {
+      TextEditingController ctrl, String? Function(String?) validator) async {
     GlobalKey<FormState> key = new GlobalKey<FormState>();
-    String result;
+    String? result;
     await showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -95,8 +103,9 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
                 TextButton(
                     onPressed: () {
-                      if (key.currentState.validate()) {
-                        key.currentState.save();
+                      var form = key.currentState!;
+                      if (form.validate()) {
+                        form.save();
                       }
                     },
                     child: Text('SAVE')),
@@ -112,7 +121,7 @@ class _ProfileViewState extends State<ProfileView> {
               onPressed: _submitChanges,
               child: Text("SAVE CHANGES")),
         ];
-        ctrl.text = result;
+        ctrl.text = result!;
       });
     }
   }

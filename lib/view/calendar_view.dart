@@ -2,7 +2,6 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:sea_mates/data/shift.dart';
-import 'package:sea_mates/data/sync_status.dart';
 import 'package:sea_mates/view/shift_add_view.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -13,8 +12,8 @@ class CalendarView extends StatefulWidget {
 
 class _CalendarState extends State<CalendarView> {
   final List<Shift> shifts = <Shift>[
-    Shift(
-      1,
+/*    Shift(
+      id: 1,
       DateTime(2021, 5, 1),
       DateTime(2021, 5, 2),
       DateTime(2021, 5, 17),
@@ -22,7 +21,7 @@ class _CalendarState extends State<CalendarView> {
       SyncStatus.SYNC,
     ),
     Shift(2, DateTime(2021, 6, 1), DateTime(2021, 6, 2), DateTime(2021, 6, 17),
-        DateTime(2021, 6, 19), SyncStatus.SYNC)
+        DateTime(2021, 6, 19), SyncStatus.SYNC)*/
   ];
 
   final unavailabilityStartDates =

@@ -17,13 +17,12 @@ class ShiftAdapter extends TypeAdapter<Shift> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Shift(
-      null,
-      fields[0] as DateTime,
-      fields[1] as DateTime,
-      fields[2] as DateTime,
-      fields[3] as DateTime,
-      fields[4] as SyncStatus,
-    );
+      boardingDate: fields[1] as DateTime?,
+      leavingDate: fields[2] as DateTime?,
+      syncStatus: fields[4] as SyncStatus?,
+    )
+      ..unavailabilityStartDate = fields[0] as DateTime
+      ..unavailabilityEndDate = fields[3] as DateTime;
   }
 
   @override
@@ -52,3 +51,36 @@ class ShiftAdapter extends TypeAdapter<Shift> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+Shift _$ShiftFromJson(Map<String, dynamic> json) {
+  return Shift(
+    id: json['id'] as int?,
+    boardingDate: json['boardingDate'] == null
+        ? null
+        : DateTime.parse(json['boardingDate'] as String),
+    leavingDate: json['leavingDate'] == null
+        ? null
+        : DateTime.parse(json['leavingDate'] as String),
+  )
+    ..unavailabilityStartDate =
+        DateTime.parse(json['unavailabilityStartDate'] as String)
+    ..unavailabilityEndDate =
+        DateTime.parse(json['unavailabilityEndDate'] as String)
+    ..cycleDays = json['cycleDays'] as int
+    ..repeat = json['repeat'] as int;
+}
+
+Map<String, dynamic> _$ShiftToJson(Shift instance) => <String, dynamic>{
+      'id': instance.id,
+      'unavailabilityStartDate':
+          instance.unavailabilityStartDate.toIso8601String(),
+      'boardingDate': instance.boardingDate.toIso8601String(),
+      'leavingDate': instance.leavingDate.toIso8601String(),
+      'unavailabilityEndDate': instance.unavailabilityEndDate.toIso8601String(),
+      'cycleDays': instance.cycleDays,
+      'repeat': instance.repeat,
+    };

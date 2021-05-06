@@ -11,7 +11,7 @@ class ShiftListModel extends ChangeNotifier {
 
   List<Shift> _shifts;
 
-  ShiftListModel(this.shiftsRepository, {List<Shift> shifts})
+  ShiftListModel(this.shiftsRepository, {List<Shift>? shifts})
       : _shifts = shifts ?? [];
 
   Future<UnmodifiableListView<Shift>> get shifts async =>
@@ -31,7 +31,7 @@ class ShiftListModel extends ChangeNotifier {
     });
 
     // Replaces local data for remote data
-    await shiftsRepository.removeLocal(localShifts.map((s) => s.id));
+    await shiftsRepository.removeLocal(localShifts.map((s) => s.id!));
     await shiftsRepository.saveLocal(remoteShifts);
 
     // Adds pending shifts to the server
@@ -44,6 +44,7 @@ class ShiftListModel extends ChangeNotifier {
 
     await shiftsRepository.addLocal(added);
     _shifts = await shiftsRepository.loadLocal();
+    notifyListeners();
   }
 
   /// Adds a new shift
@@ -62,7 +63,7 @@ class ShiftListModel extends ChangeNotifier {
     List<int> synced = [], unsynced = [];
     indexes.forEach((index) {
       var shift = _shifts.elementAt(index);
-      int id = shift.id;
+      int id = shift.id!;
       shift.syncStatus == SyncStatus.SYNC ? synced.add(id) : unsynced.add(id);
     });
 

@@ -18,7 +18,7 @@ class ShiftAddView extends StatelessWidget {
 }
 
 class ShiftForm extends StatefulWidget {
-  const ShiftForm({Key key}) : super(key: key);
+  //const ShiftForm({Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _ShiftFormState();
@@ -28,7 +28,7 @@ class _ShiftFormState extends State<StatefulWidget> {
   Shift _shift = new Shift();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  FocusNode _unStartDate,
+  late FocusNode _unStartDate,
       _boardDate,
       _leaveDate,
       _unEndDate,
@@ -77,12 +77,12 @@ class _ShiftFormState extends State<StatefulWidget> {
   }
 
   void _pickDate(TextEditingController ctrl) async {
-    DateTime selected = _parseDate(ctrl.text);
+    DateTime? selected = _parseDate(ctrl.text);
     if (selected == null) {
       selected = DateTime.now();
     }
 
-    DateTime result = await showDatePicker(
+    DateTime? result = await showDatePicker(
         context: context,
         initialDate: selected,
         firstDate: selected.subtract(Duration(days: 1000)),
@@ -95,14 +95,14 @@ class _ShiftFormState extends State<StatefulWidget> {
     }
   }
 
-  String _validateUnStartDate(String value) {
+  String? _validateUnStartDate(String? value) {
     if (value == null) {
       _unStartDateController.text = _boardDateController.text;
       return null;
     }
 
-    DateTime selected = _parseDate(value);
-    DateTime boarding = _parseDate(_boardDateController.text);
+    DateTime? selected = _parseDate(value);
+    DateTime? boarding = _parseDate(_boardDateController.text);
     if (selected == null) {
       return "Invalid date";
     }
@@ -118,13 +118,13 @@ class _ShiftFormState extends State<StatefulWidget> {
     return null;
   }
 
-  String _validateBoardDate(String value) {
+  String? _validateBoardDate(String? value) {
     if (value == null || value.isEmpty) {
       return "Boarding date is mandatory";
     }
 
-    DateTime selected = _parseDate(value);
-    DateTime leaving = _parseDate(_leaveDateController.text);
+    DateTime? selected = _parseDate(value);
+    DateTime? leaving = _parseDate(_leaveDateController.text);
     if (selected == null) {
       return "Invalid date";
     }
@@ -140,13 +140,13 @@ class _ShiftFormState extends State<StatefulWidget> {
     return null;
   }
 
-  String _validateLeaveDate(String value) {
+  String? _validateLeaveDate(String? value) {
     if (value == null || value.isEmpty) {
       return "Leaving date is mandatory if cycle is not fulfilled";
     }
 
-    DateTime selected = _parseDate(value);
-    DateTime unEnd = _parseDate(_unEndDateController.text);
+    DateTime? selected = _parseDate(value);
+    DateTime? unEnd = _parseDate(_unEndDateController.text);
 
     if (selected == null) {
       return "Invalid date";
@@ -161,13 +161,13 @@ class _ShiftFormState extends State<StatefulWidget> {
     }
   }
 
-  String _validateCycleDays(String value) {
+  String? _validateCycleDays(String? value) {
     if (value == null || value.isEmpty) {
       _cycleDaysController.text = "0";
       return null;
     }
 
-    int days = int.tryParse(value);
+    int? days = int.tryParse(value);
     if (days == null) {
       return "Are you sure you typed numbers?";
     } else if (days > 1000) {
@@ -179,7 +179,7 @@ class _ShiftFormState extends State<StatefulWidget> {
     return null;
   }
 
-  String _validateRepeat(String value) {
+  String? _validateRepeat(String? value) {
     if (value == null || value.isEmpty) {
       _repeatController.text = '0';
       return null;
@@ -197,9 +197,9 @@ class _ShiftFormState extends State<StatefulWidget> {
 
   void _handleBoardDateChange() {
     String value = _boardDateController.text;
-    DateTime unStart = _parseDate(_unStartDateController.text);
+    DateTime? unStart = _parseDate(_unStartDateController.text);
     if (unStart == null) {
-      if (value != null && value.isNotEmpty) {
+      if (value.isNotEmpty) {
         setState(() {
           _unStartDateController.text = value;
         });
@@ -207,8 +207,8 @@ class _ShiftFormState extends State<StatefulWidget> {
     }
 
     if (!useCycle) {
-      DateTime boarding = _parseDate(value);
-      DateTime leaving = _parseDate(_leaveDateController.text);
+      DateTime? boarding = _parseDate(value);
+      DateTime? leaving = _parseDate(_leaveDateController.text);
       if (boarding != null && leaving != null) {
         var diff = leaving.difference(boarding);
         _cycleDaysController.text = diff.inDays.toString();
@@ -218,9 +218,9 @@ class _ShiftFormState extends State<StatefulWidget> {
 
   void _handleLeaveDateChange() {
     String value = _leaveDateController.text;
-    DateTime unEnd = _parseDate(_unEndDateController.text);
+    DateTime? unEnd = _parseDate(_unEndDateController.text);
     if (unEnd == null) {
-      if (value != null && value.isNotEmpty) {
+      if (value.isNotEmpty) {
         setState(() {
           _unEndDateController.text = value;
         });
@@ -228,8 +228,8 @@ class _ShiftFormState extends State<StatefulWidget> {
     }
 
     if (!useCycle) {
-      DateTime boarding = _parseDate(_boardDateController.text);
-      DateTime leaving = _parseDate(value);
+      DateTime? boarding = _parseDate(_boardDateController.text);
+      DateTime? leaving = _parseDate(value);
       if (boarding != null && leaving != null) {
         var diff = leaving.difference(boarding);
         _cycleDaysController.text = diff.inDays.toString();
@@ -238,10 +238,10 @@ class _ShiftFormState extends State<StatefulWidget> {
   }
 
   void _calculateCycle() {
-    int days = int.tryParse(_cycleDaysController.text);
+    int? days = int.tryParse(_cycleDaysController.text);
     if (days != null) {
-      DateTime boarding = _parseDate(_boardDateController.text);
-      DateTime unStartDate = _parseDate(_unStartDateController.text);
+      DateTime? boarding = _parseDate(_boardDateController.text);
+      DateTime? unStartDate = _parseDate(_unStartDateController.text);
       if (boarding != null) {
         DateTime leaving = boarding.add(Duration(days: days));
         DateTime unEnd = leaving;
@@ -255,9 +255,9 @@ class _ShiftFormState extends State<StatefulWidget> {
 
   void _handleSubmit() async {
     // Submission logic, including decision about local vs remote saving
-    final form = _formKey.currentState;
+    final form = _formKey.currentState!;
     if (form.validate()) {
-      _formKey.currentState.save();
+      form.save();
       await Provider.of<ShiftListModel>(context, listen: false).add(_shift);
       Navigator.pop(context);
     }
@@ -295,7 +295,7 @@ class _ShiftFormState extends State<StatefulWidget> {
                   _pickDate(_unStartDateController);
                 },
                 onSaved: (value) {
-                  _shift.unavailabilityStartDate = _parseDate(value);
+                  _shift.unavailabilityStartDate = _parseDate(value)!;
                 }),
             sizedBox,
             TextFormField(
@@ -314,7 +314,7 @@ class _ShiftFormState extends State<StatefulWidget> {
                   _pickDate(_boardDateController);
                 },
                 onSaved: (value) {
-                  _shift.boardingDate = _parseDate(value);
+                  _shift.boardingDate = _parseDate(value)!;
                 }),
             SizedBox(
               height: 15,
@@ -353,7 +353,7 @@ class _ShiftFormState extends State<StatefulWidget> {
                         _calculateCycle();
                       },
                       onSaved: (value) {
-                        _shift.cycleDays = int.parse(value);
+                        _shift.cycleDays = int.parse(value!);
                       },
                     ))
               ],
@@ -376,7 +376,7 @@ class _ShiftFormState extends State<StatefulWidget> {
                   _pickDate(_leaveDateController);
                 },
                 onSaved: (value) {
-                  _shift.leavingDate = _parseDate(value);
+                  _shift.leavingDate = _parseDate(value)!;
                 }),
             sizedBox,
             TextFormField(
@@ -396,7 +396,7 @@ class _ShiftFormState extends State<StatefulWidget> {
                   _pickDate(_unEndDateController);
                 },
                 onSaved: (value) {
-                  _shift.unavailabilityEndDate = _parseDate(value);
+                  _shift.unavailabilityEndDate = _parseDate(value)!;
                 }),
             sizedBox,
             TextFormField(
@@ -414,7 +414,7 @@ class _ShiftFormState extends State<StatefulWidget> {
                 validator: _validateRepeat,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 onSaved: (value) {
-                  _shift.repeat = int.parse(value);
+                  _shift.repeat = int.parse(value!);
                 }),
             SizedBox(
               height: 20,
@@ -432,7 +432,8 @@ class _ShiftFormState extends State<StatefulWidget> {
   }
 }
 
-DateTime _parseDate(String text) {
+DateTime? _parseDate(String? text) {
+  if (text == null) return null;
   try {
     return DateFormat.yMd().parse(text);
   } on FormatException {

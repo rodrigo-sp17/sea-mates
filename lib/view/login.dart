@@ -57,7 +57,7 @@ class _LoginFormState extends State<LoginForm> {
               AutofillHints.username,
             ],
             onSaved: (value) {
-              username = value;
+              username = value!;
             },
           ),
           TextFormField(
@@ -69,7 +69,7 @@ class _LoginFormState extends State<LoginForm> {
             ),
             autofillHints: [AutofillHints.password],
             onSaved: (value) {
-              password = value;
+              password = value!;
             },
           ),
           SizedBox(
