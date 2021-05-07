@@ -4,15 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/data/auth_user.dart';
+import 'package:sea_mates/data/local_user.dart';
 import 'package:sea_mates/data/user.dart';
 import 'package:sea_mates/data/user_request.dart';
+import 'package:sea_mates/model/shift_list_model.dart';
 import 'package:sea_mates/repository/user_repository.dart';
 
 class UserModel extends ChangeNotifier {
   final UserRepository userRepository;
+  late ShiftListModel shiftListModel;
 
   UserModel(this.userRepository) {
     load();
+  }
+
+  void update(ShiftListModel shiftListModel) {
+    this.shiftListModel = shiftListModel;
   }
 
   bool _loaded = false;
@@ -97,12 +104,18 @@ class UserModel extends ChangeNotifier {
   }
 
   Future<bool> loginAsLocal() async {
-    // TODO
+    User user = new LocalUser();
+    await userRepository.saveUser(user);
+    _user = user;
     return true;
   }
 
   Future<void> logout() async {
-    // TOOD
+    await shiftListModel.clearLocalDatabase();
+    await userRepository.dropUser();
+    _userStatus = UserStatus.ANONYMOUS;
+    _user = null;
+    notifyListeners();
   }
 
   Future<bool> _getUserInfo(String token) async {

@@ -34,7 +34,11 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProxyProvider<UserModel, ShiftListModel>(
               create: (_) =>
                   ShiftListModel(ShiftWebClient(), ShiftHiveRepository()),
-              update: (_, uModel, slModel) => slModel!.update(uModel))
+              update: (_, uModel, slModel) {
+                slModel!.update(uModel);
+                uModel.update(slModel);
+                return slModel;
+              }),
         ],
         child: MaterialApp(
             title: 'Flutter Demo',
@@ -43,7 +47,7 @@ class MyApp extends StatelessWidget {
             ),
             home: Consumer<UserModel>(
               builder: (context, model, child) {
-                if (model.userStatus == UserStatus.AUTH) {
+                if (model.userStatus != UserStatus.ANONYMOUS) {
                   return HomePage();
                 } else {
                   return WelcomePage();

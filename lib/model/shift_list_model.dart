@@ -11,14 +11,18 @@ import 'package:sea_mates/repository/shift_remote_repository.dart';
 class ShiftListModel extends ChangeNotifier {
   final ShiftRemoteRepository shiftRemoteRepository;
   final ShiftLocalRepository shiftLocalRepository;
-  final UserModel userModel;
+  late UserModel userModel;
 
   List<Shift> _shifts;
 
-  ShiftListModel(
-      this.shiftRemoteRepository, this.shiftLocalRepository, this.userModel,
+  ShiftListModel(this.shiftRemoteRepository, this.shiftLocalRepository,
       {List<Shift>? shifts})
       : _shifts = shifts ?? [];
+
+  ShiftListModel update(UserModel userModel) {
+    this.userModel = userModel;
+    return this;
+  }
 
   Future<UnmodifiableListView<Shift>> get shifts async =>
       UnmodifiableListView(_shifts);
@@ -97,5 +101,9 @@ class ShiftListModel extends ChangeNotifier {
       _shifts = await shiftLocalRepository.loadLocal();
       notifyListeners();
     }
+  }
+
+  Future<void> clearLocalDatabase() async {
+    await shiftLocalRepository.clear();
   }
 }

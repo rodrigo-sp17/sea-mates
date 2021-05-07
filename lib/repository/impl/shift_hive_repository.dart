@@ -44,4 +44,14 @@ class ShiftHiveRepository implements ShiftLocalRepository {
     var result = shifts.map((e) => box.get(e.id) as Shift).toList();
     return result;
   }
+
+  @override
+  Future<bool> clear() async {
+    var box = await Hive.openBox(_boxName);
+    var answer = true;
+    await box.clear().catchError((e) {
+      answer = false;
+    });
+    return answer;
+  }
 }
