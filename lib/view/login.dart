@@ -1,6 +1,8 @@
-import 'dart:io';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sea_mates/model/user_model.dart';
 
 class Login extends StatelessWidget {
   @override
@@ -15,83 +17,92 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   String username = "";
   String password = "";
-  bool isLoading = false;
 
   void _submit() async {
-    setState(() {
-      isLoading = true;
-    });
+    _formKey.currentState!.save();
+    log(username);
+    log(password);
 
-    var result;
+    var result = Provider.of<UserModel>(context, listen: false)
+        .login(username, password);
 
-    sleep(Duration(seconds: 2));
-/*    if (result.statusCode == 200) {
-
-    } else if (result.statusCode == 401 || result.statusCode == 403){
-      // wrong login
-
-    }*/
-
-    setState(() {
-      isLoading = false;
+    await result.then(
+      (success) {
+        if (success) {
+          Navigator.pushNamed(context, '/home');
+        } else {
+          _showFailureDialog("Incorrect username/email and/or password");
+        }
+      },
+    ).catchError((e) {
+      _showFailureDialog(e.toString());
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Form(
+        key: _formKey,
         child: Container(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextFormField(
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-                icon: const Icon(Icons.person_outline),
-                labelText: 'Email or Username'),
-            autofillHints: [
-              AutofillHints.username,
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextFormField(
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                    icon: const Icon(Icons.person_outline),
+                    labelText: 'Email or Username'),
+                autofillHints: [
+                  AutofillHints.username,
+                ],
+                onSaved: (value) {
+                  username = value!;
+                },
+              ),
+              TextFormField(
+                textInputAction: TextInputAction.next,
+                obscureText: true,
+                decoration: InputDecoration(
+                  icon: const Icon(Icons.security),
+                  labelText: 'Password',
+                ),
+                autofillHints: [AutofillHints.password],
+                onSaved: (value) {
+                  password = value!;
+                },
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Consumer<UserModel>(
+                builder: (context, model, child) {
+                  if (model.loaded) {
+                    return ElevatedButton(
+                        style: ButtonStyle(),
+                        onPressed: _submit,
+                        child: Text('LOGIN'));
+                  } else {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
             ],
-            onSaved: (value) {
-              username = value!;
-            },
           ),
-          TextFormField(
-            textInputAction: TextInputAction.next,
-            obscureText: true,
-            decoration: InputDecoration(
-              icon: const Icon(Icons.security),
-              labelText: 'Password',
-            ),
-            autofillHints: [AutofillHints.password],
-            onSaved: (value) {
-              password = value!;
-            },
-          ),
-          SizedBox(
-            height: 30,
-          ),
-          Visibility(
-              visible: isLoading,
-              child: LinearProgressIndicator(
-                value: null,
-              )),
-          ElevatedButton(
-              style: ButtonStyle(), onPressed: _submit, child: Text('LOGIN'))
-        ],
-      ),
-    ));
+        ));
   }
 
-  void _showDialog(String message) {
+  void _showFailureDialog(String failedMessage) {
     showDialog(
         context: context,
         builder: (_) => AlertDialog(
-              title: Text(message),
+              title: Text("Failed to login"),
+              content: Text(failedMessage),
             ));
   }
 }

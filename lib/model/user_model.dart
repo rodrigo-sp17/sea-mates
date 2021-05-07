@@ -1,24 +1,39 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/data/auth_user.dart';
 import 'package:sea_mates/data/user.dart';
+import 'package:sea_mates/data/user_request.dart';
 import 'package:sea_mates/repository/user_repository.dart';
 
 class UserModel extends ChangeNotifier {
   final UserRepository userRepository;
 
-  UserModel(this.userRepository);
-
-  User? _user;
-
-  User? get user => _user;
-
-  void load() async {
-    _user = await userRepository.loadUser();
-    notifyListeners();
+  UserModel(this.userRepository) {
+    load();
   }
 
-  bool hasUser() {
-    return _user != null;
+  bool _loaded = false;
+  User? _user;
+  UserStatus _userStatus = UserStatus.ANONYMOUS;
+
+  User? get user => _user;
+  UserStatus get userStatus => _userStatus;
+  bool get loaded => _loaded;
+
+  Future<void> load() async {
+    _loaded = false;
+    try {
+      _user = await userRepository.loadUser();
+      _userStatus = _user!.isLocalUser() ? UserStatus.LOCAL : UserStatus.AUTH;
+    } on UserNotFoundException {
+      _user = null;
+      _userStatus = UserStatus.ANONYMOUS;
+    }
+    _loaded = true;
+    notifyListeners();
   }
 
   bool hasAuthentication() {
@@ -31,10 +46,6 @@ class UserModel extends ChangeNotifier {
     }
   }
 
-  Future<void> login(String username, String password) async {
-    // login, updates all
-  }
-
   String getToken() {
     if (_user == null) {
       throw Exception("Not an auth user!");
@@ -44,4 +55,71 @@ class UserModel extends ChangeNotifier {
       return (_user as AuthenticatedUser).token;
     }
   }
+
+  Future<void> signup(UserRequest request) async {
+    // TODO
+  }
+
+  Future<bool> login(String username, String password) async {
+    _loaded = false;
+    notifyListeners();
+
+    var uri = Uri.https(ApiUtils.API_BASE, '/login');
+    Map<String, String> body = {"username": username, "password": password};
+    var response = await http.post(uri,
+        body: jsonEncode(body), headers: {"content-type": "application/json"});
+
+    String? error;
+    bool answer = false;
+
+    if (response.statusCode == 200) {
+      var token = response.headers['authorization'];
+      var hasUserInfo = await _getUserInfo(token!);
+      if (hasUserInfo) {
+        answer = true;
+      } else {
+        error = "Failed to fetch user info";
+      }
+    } else if (response.statusCode == 403 || response.statusCode == 401) {
+      answer = false;
+    } else {
+      error = "Something seem wrong with the server...";
+    }
+
+    _loaded = true;
+    notifyListeners();
+
+    if (error != null) {
+      return Future.error(error);
+    } else {
+      return answer;
+    }
+  }
+
+  Future<bool> loginAsLocal() async {
+    // TODO
+    return true;
+  }
+
+  Future<void> logout() async {
+    // TOOD
+  }
+
+  Future<bool> _getUserInfo(String token) async {
+    var result = await http.get(Uri.https(ApiUtils.API_BASE, 'api/user/me'),
+        headers: {'authorization': token});
+
+    if (result.statusCode == 200) {
+      //var user = AuthenticatedUser.fromJson(jsonDecode(result.body));
+      var user = new AuthenticatedUser(1, "", "", "", "");
+      user.token = token;
+      userRepository.saveUser(user);
+      await load();
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
+
+enum UserStatus { ANONYMOUS, LOCAL, AUTH }

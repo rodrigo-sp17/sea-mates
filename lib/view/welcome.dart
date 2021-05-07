@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:sea_mates/view/home.dart';
-import 'package:sea_mates/view/login.dart';
+import 'package:provider/provider.dart';
+import 'package:sea_mates/model/user_model.dart';
 
 class WelcomePage extends StatelessWidget {
   @override
@@ -24,12 +24,14 @@ class WelcomePage extends StatelessWidget {
                   // retrieve info, send to endpoint to process
                   // go to socialSignup
                   // or save token
+                  showDialog(
+                      context: context,
+                      builder: (_) => SimpleDialog(title: Text('Soon...')));
                 },
                 child: Text("Continue with Facebook")),
             ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Login()));
+                  Navigator.pushNamed(context, '/login');
                 },
                 child: Text("Login")),
             Divider(
@@ -45,44 +47,84 @@ class WelcomePage extends StatelessWidget {
               height: 20,
               thickness: 2,
             ),
-            ElevatedButton(
-                onPressed: () {
-                  // notify user about later sync possibilities
-                  // notify about friends not available while offline
-                  showDialog(
-                      context: context,
-                      builder: (_) => AlertDialog(
-                            title: Text("Entering as Anonymous"),
-                            content: SingleChildScrollView(
-                              child: Text(
-                                  'You are now going in anonymous mode.\n\n'
-                                  'In this mode, you will not be able to:\n'
-                                  '- Add friends\n'
-                                  '- View friends shifts\n'
-                                  '- Invite friends to events\n'
-                                  '- Sync with the cloud\n\n'
-                                  'However, don\'t worry!\n'
-                                  'You can add an account later and sync your shifts! :)'),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, false),
-                                child: Text('Cancel'),
-                              ),
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => HomePage()));
-                                  },
-                                  child: Text('Got ya!'))
-                            ],
-                          ));
-                  // push anonymous
-                },
-                child: Text("Continue offline"))
+            Consumer<UserModel>(builder: (context, model, child) {
+              switch (model.userStatus) {
+                case UserStatus.ANONYMOUS:
+                  return ElevatedButton(
+                      onPressed: () {
+                        _showLocalUserDialog(context);
+                      },
+                      child: Text("Continue offline"));
+                case UserStatus.LOCAL:
+                  return ElevatedButton(
+                      onPressed: () => Navigator.pushNamed(context, '/home'),
+                      child: Text("Remain in local mode"));
+                case UserStatus.AUTH:
+                  return ElevatedButton(
+                    onPressed: () => _showLogoutDialog(context),
+                    child: Text("Logout"),
+                  );
+                default:
+                  throw AssertionError("Unrecognized user status");
+              }
+            })
           ],
         )));
   }
+}
+
+void _showLocalUserDialog(BuildContext context) {
+  showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+            title: Text("Entering in Local mode"),
+            content: SingleChildScrollView(
+              child: Text('You are now going in local mode.\n\n'
+                  'In this mode, you will not be able to:\n'
+                  '- Add friends\n'
+                  '- View friends shifts\n'
+                  '- Invite friends to events\n'
+                  '- Sync with the cloud\n\n'
+                  'However, don\'t worry!\n'
+                  'You can add an account later and sync your shifts! :)'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                  onPressed: () async {
+                    var result =
+                        await Provider.of<UserModel>(context, listen: false)
+                            .loginAsLocal();
+                    if (result) Navigator.pushNamed(context, '/home');
+                  },
+                  child: Text('Got ya!'))
+            ],
+          ));
+}
+
+void _showLogoutDialog(BuildContext context) {
+  showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+            title: Text("Logout"),
+            content: SingleChildScrollView(
+              child: Text('Are you sure you want to logout?\n'
+                  'All your un-synced modifications will be discarded.'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('CANCEL'),
+              ),
+              TextButton(
+                  onPressed: () async {
+                    await Provider.of<UserModel>(context, listen: false)
+                        .logout();
+                  },
+                  child: Text('YES, LOG ME OUT!'))
+            ],
+          ));
 }
