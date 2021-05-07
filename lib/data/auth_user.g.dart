@@ -17,18 +17,17 @@ class AuthenticatedUserAdapter extends TypeAdapter<AuthenticatedUser> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return AuthenticatedUser(
-      fields[0] as int,
-      fields[1] as String,
-      fields[2] as String,
-      fields[3] as String,
-      fields[4] as String,
+      id: fields[0] as int,
+      username: fields[1] as String,
+      name: fields[2] as String,
+      email: fields[3] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, AuthenticatedUser obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -36,9 +35,7 @@ class AuthenticatedUserAdapter extends TypeAdapter<AuthenticatedUser> {
       ..writeByte(2)
       ..write(obj.name)
       ..writeByte(3)
-      ..write(obj.email)
-      ..writeByte(4)
-      ..write(obj.token);
+      ..write(obj.email);
   }
 
   @override
@@ -57,13 +54,17 @@ class AuthenticatedUserAdapter extends TypeAdapter<AuthenticatedUser> {
 // **************************************************************************
 
 AuthenticatedUser _$AuthenticatedUserFromJson(Map<String, dynamic> json) {
-  return AuthenticatedUser(json['userId'] as int, json['username'] as String,
-      json['name'] as String, json['email'] as String, "");
+  return AuthenticatedUser(
+    id: json['userId'] as int,
+    username: json['username'] as String,
+    name: json['name'] as String,
+    email: json['email'] as String,
+  );
 }
 
 Map<String, dynamic> _$AuthenticatedUserToJson(AuthenticatedUser instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      'userId': instance.id,
       'username': instance.username,
       'name': instance.name,
       'email': instance.email,

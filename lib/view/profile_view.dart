@@ -1,8 +1,10 @@
-import 'dart:developer';
 import 'dart:ui';
 
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sea_mates/data/auth_user.dart';
+import 'package:sea_mates/model/user_model.dart';
 
 class ProfileView extends StatefulWidget {
   @override
@@ -37,7 +39,7 @@ class _ProfileViewState extends State<ProfileView> {
     super.dispose();
   }
 
-  String? _validateUsername(String? value) {
+/*  String? _validateUsername(String? value) {
     if (value == null || value.isEmpty) {
       return "Username is mandatory";
     }
@@ -49,7 +51,7 @@ class _ProfileViewState extends State<ProfileView> {
       return "Invalid username";
     }
     return null;
-  }
+  }*/
 
   String? _validateName(String? value) {
     if (value == null || value.isEmpty) {
@@ -158,78 +160,152 @@ class _ProfileViewState extends State<ProfileView> {
               heightFactor: 4,
               child: Icon(Icons.person_sharp),
             ),
-            TextField(
-              controller: _usernameController,
-              enabled: true,
-              readOnly: true,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                icon: Icon(Icons.person_outline),
-                labelText: "Username",
-              ),
-            ),
-            sizedBox,
-            TextField(
-              controller: _nameController,
-              enabled: true,
-              readOnly: true,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  icon: Icon(Icons.person),
-                  labelText: "Name",
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                      _editValue(_nameController, _validateName);
-                    },
-                  )),
-            ),
-            sizedBox,
-            TextField(
-              controller: _emailController,
-              enabled: true,
-              readOnly: true,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  icon: Icon(Icons.email),
-                  labelText: "Email",
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                      log("pressed");
-                      _editValue(_emailController, _validateEmail);
-                    },
-                  )),
-            ),
-            sizedBox,
-            Visibility(
-                visible: submitting,
-                child: SizedBox(
-                  height: 90,
-                  child: Center(child: CircularProgressIndicator()),
-                )),
+            Consumer<UserModel>(builder: (context, model, child) {
+              if (model.userStatus == UserStatus.AUTH) {
+                AuthenticatedUser user = model.user as AuthenticatedUser;
+                _usernameController.text = user.username;
+                _nameController.text = user.name;
+                _emailController.text = user.email;
+              } else {
+                return Center(
+                  child: Text(
+                    'Logged as Local User',
+                    textScaleFactor: 1.3,
+                  ),
+                );
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextField(
+                    controller: _usernameController,
+                    enabled: true,
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      icon: Icon(Icons.person_outline),
+                      labelText: "Username",
+                    ),
+                  ),
+                  sizedBox,
+                  TextField(
+                    controller: _nameController,
+                    enabled: true,
+                    readOnly: true,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        icon: Icon(Icons.person),
+                        labelText: "Name",
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () {
+                            _editValue(_nameController, _validateName);
+                          },
+                        )),
+                  ),
+                  sizedBox,
+                  TextField(
+                    controller: _emailController,
+                    enabled: true,
+                    readOnly: true,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        icon: Icon(Icons.email),
+                        labelText: "Email",
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () {
+                            _editValue(_emailController, _validateEmail);
+                          },
+                        )),
+                  ),
+                  sizedBox,
+                  Visibility(
+                      visible: submitting,
+                      child: SizedBox(
+                        height: 90,
+                        child: Center(child: CircularProgressIndicator()),
+                      )),
+                ],
+              );
+            }),
             Divider(
-              height: 40,
+              height: 30,
               thickness: 3,
             ),
-            ElevatedButton(
-              style: ButtonStyle(
-                  foregroundColor: MaterialStateProperty.all(Colors.black),
-                  backgroundColor: MaterialStateProperty.all(Colors.red)),
-              child: Text(
-                "DELETE ACCOUNT",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-                textScaleFactor: 1.2,
-              ),
-              onPressed: () {
-                // TODO - delete account
-              },
-            )
+            Consumer<UserModel>(builder: (context, model, child) {
+              switch (model.userStatus) {
+                case UserStatus.AUTH:
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ElevatedButton(
+                        child: Text(
+                          'LOGOUT',
+                          textScaleFactor: 1.2,
+                        ),
+                        onPressed: () => _showLogoutDialog(context),
+                      ),
+                      Divider(
+                        height: 30,
+                        thickness: 3,
+                      ),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all(Colors.black),
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.red)),
+                        child: Text(
+                          "DELETE ACCOUNT",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textScaleFactor: 1.2,
+                        ),
+                        onPressed: () {
+                          // TODO - delete account
+                        },
+                      ),
+                    ],
+                  );
+                case UserStatus.LOCAL:
+                  return ElevatedButton(
+                      onPressed: () => Navigator.pushNamed(context, '/welcome'),
+                      child: Text('UPGRADE ACCOUNT'));
+                default:
+                  return Center();
+              }
+            }),
           ])),
         )
       ],
     );
   }
+}
+
+void _showLogoutDialog(BuildContext context) {
+  showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+            title: Text("Logout"),
+            content: SingleChildScrollView(
+              child: Text('Are you sure you want to logout?\n'
+                  'All your un-synced modifications will be discarded.'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('CANCEL'),
+              ),
+              TextButton(
+                  onPressed: () async {
+                    await Provider.of<UserModel>(context, listen: false)
+                        .logout();
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/welcome', (_) => false);
+                  },
+                  child: Text('YES, LOG ME OUT!'))
+            ],
+          ));
 }

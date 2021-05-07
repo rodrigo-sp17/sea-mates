@@ -6,70 +6,73 @@ import 'package:sea_mates/model/user_model.dart';
 class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.white,
-        body: Scrollbar(
-            child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-          children: [
-            SizedBox(
-              height: 220,
-              child: Text('Logo placeholder'),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  // retrieve info, send to endpoint to process
-                  // go to socialSignup
-                  // or save token
-                  showDialog(
-                      context: context,
-                      builder: (_) => SimpleDialog(title: Text('Soon...')));
-                },
-                child: Text("Continue with Facebook")),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/login');
-                },
-                child: Text("Login")),
-            Divider(
-              height: 20,
-              thickness: 2,
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  // push signup
-                },
-                child: Text("Signup")),
-            Divider(
-              height: 20,
-              thickness: 2,
-            ),
-            Consumer<UserModel>(builder: (context, model, child) {
-              switch (model.userStatus) {
-                case UserStatus.ANONYMOUS:
-                  return ElevatedButton(
-                      onPressed: () {
-                        _showLocalUserDialog(context);
-                      },
-                      child: Text("Continue offline"));
-                case UserStatus.LOCAL:
-                  return ElevatedButton(
-                      onPressed: () => Navigator.pushNamed(context, '/home'),
-                      child: Text("Remain in local mode"));
-                case UserStatus.AUTH:
-                  return ElevatedButton(
-                    onPressed: () => _showLogoutDialog(context),
-                    child: Text("Logout"),
-                  );
-                default:
-                  throw AssertionError("Unrecognized user status");
-              }
-            })
-          ],
-        )));
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Scrollbar(
+              child: ListView(
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+            children: [
+              SizedBox(
+                height: 220,
+                child: Text('Logo placeholder'),
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    // retrieve info, send to endpoint to process
+                    // go to socialSignup
+                    // or save token
+                    showDialog(
+                        context: context,
+                        builder: (_) => SimpleDialog(title: Text('Soon...')));
+                  },
+                  child: Text("Continue with Facebook")),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/login');
+                  },
+                  child: Text("Login")),
+              Divider(
+                height: 20,
+                thickness: 2,
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    // push signup
+                  },
+                  child: Text("Signup")),
+              Divider(
+                height: 20,
+                thickness: 2,
+              ),
+              Consumer<UserModel>(builder: (context, model, child) {
+                switch (model.userStatus) {
+                  case UserStatus.ANONYMOUS:
+                    return ElevatedButton(
+                        onPressed: () {
+                          _showLocalUserDialog(context);
+                        },
+                        child: Text("Continue offline"));
+                  case UserStatus.LOCAL:
+                    return ElevatedButton(
+                        onPressed: () => Navigator.pushNamed(context, '/home'),
+                        child: Text("Remain in local mode"));
+                  case UserStatus.AUTH:
+                    return ElevatedButton(
+                      onPressed: () => _showLogoutDialog(context),
+                      child: Text("Logout"),
+                    );
+                  default:
+                    throw AssertionError("Unrecognized user status");
+                }
+              })
+            ],
+          ))),
+    );
   }
 }
 
@@ -91,16 +94,18 @@ void _showLocalUserDialog(BuildContext context) {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('Cancel'),
+                child: Text('CANCEL'),
               ),
               TextButton(
                   onPressed: () async {
                     var result =
                         await Provider.of<UserModel>(context, listen: false)
                             .loginAsLocal();
-                    if (result) Navigator.pushNamed(context, '/home');
+                    if (result)
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, '/home', (_) => false);
                   },
-                  child: Text('Got ya!'))
+                  child: Text('GOT IT!'))
             ],
           ));
 }

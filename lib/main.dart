@@ -20,25 +20,26 @@ void main() async {
   Hive.registerAdapter(ShiftAdapter());
   Hive.registerAdapter(SyncStatusAdapter());
   Hive.registerAdapter(AuthenticatedUserAdapter());
-  runApp(MyApp());
+
+  var userModel = UserModel(UserHiveRepository());
+  var shiftListModel = ShiftListModel(ShiftWebClient(), ShiftHiveRepository());
+  shiftListModel.update(userModel);
+  userModel.update(shiftListModel);
+
+  runApp(MyApp(userModel, shiftListModel));
 }
 
 class MyApp extends StatelessWidget {
+  MyApp(this.userModel, this.shiftListModel);
+  final UserModel userModel;
+  final ShiftListModel shiftListModel;
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
         providers: [
-          ChangeNotifierProvider(
-            create: (_) => UserModel(UserHiveRepository()),
-          ),
-          ChangeNotifierProxyProvider<UserModel, ShiftListModel>(
-              create: (_) =>
-                  ShiftListModel(ShiftWebClient(), ShiftHiveRepository()),
-              update: (_, uModel, slModel) {
-                slModel!.update(uModel);
-                uModel.update(slModel);
-                return slModel;
-              }),
+          ChangeNotifierProvider.value(value: userModel),
+          ChangeNotifierProvider.value(value: shiftListModel)
         ],
         child: MaterialApp(
             title: 'Flutter Demo',

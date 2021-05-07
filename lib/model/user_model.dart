@@ -107,6 +107,8 @@ class UserModel extends ChangeNotifier {
     User user = new LocalUser();
     await userRepository.saveUser(user);
     _user = user;
+    _userStatus = UserStatus.LOCAL;
+    notifyListeners();
     return true;
   }
 
@@ -123,10 +125,17 @@ class UserModel extends ChangeNotifier {
         headers: {'authorization': token});
 
     if (result.statusCode == 200) {
-      //var user = AuthenticatedUser.fromJson(jsonDecode(result.body));
-      var user = new AuthenticatedUser(1, "", "", "", "");
+      var json = jsonDecode(result.body);
+      AuthenticatedUser user;
+      try {
+        user = AuthenticatedUser.fromAppUserJson(json);
+      } catch (e) {
+        _loaded = true;
+        notifyListeners();
+        return false;
+      }
       user.token = token;
-      userRepository.saveUser(user);
+      await userRepository.saveUser(user);
       await load();
       return true;
     } else {

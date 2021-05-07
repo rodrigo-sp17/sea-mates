@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:sea_mates/data/shift.dart';
@@ -94,9 +95,10 @@ class ShiftListModel extends ChangeNotifier {
 
     // for synced - requires online access
     if (synced.isNotEmpty && userModel.hasAuthentication()) {
-      await shiftRemoteRepository
-          .removeRemote(synced, token)
-          .catchError((e) => throw e);
+      await shiftRemoteRepository.removeRemote(synced, token).catchError((e) {
+        log(e.toString());
+        throw Exception('Deletion failed! :(');
+      });
       await shiftLocalRepository.removeLocal(synced);
       _shifts = await shiftLocalRepository.loadLocal();
       notifyListeners();
