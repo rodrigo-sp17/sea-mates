@@ -7,6 +7,7 @@ import 'package:sea_mates/data/auth_user.dart';
 import 'package:sea_mates/data/local_user.dart';
 import 'package:sea_mates/data/user.dart';
 import 'package:sea_mates/data/user_request.dart';
+import 'package:sea_mates/exception/rest_exceptions.dart';
 import 'package:sea_mates/model/shift_list_model.dart';
 import 'package:sea_mates/repository/user_repository.dart';
 
@@ -81,7 +82,7 @@ class UserModel extends ChangeNotifier {
 
     if (response.statusCode == 200) {
       var token = response.headers['authorization'];
-      var hasUserInfo = await _getUserInfo(token!);
+      var hasUserInfo = await _fetchUserInfo(token!);
       if (hasUserInfo) {
         answer = true;
       } else {
@@ -120,7 +121,41 @@ class UserModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> _getUserInfo(String token) async {
+  Future<bool> editUser(String name, String email) async {
+    assert(email.isNotEmpty);
+
+    var user = _user as AuthenticatedUser;
+    var token = user.token;
+    Map<String, String> body = {
+      "userId": user.id.toString(),
+      "name": name,
+    };
+    if (user.email != email) {
+      body['email'] = email;
+    }
+
+    var result = await http.put(Uri.https(ApiUtils.API_BASE, 'api/user'),
+        headers: {'authorization': token, 'content-type': 'application/json'},
+        body: jsonEncode(body));
+
+    switch (result.statusCode) {
+      case 200:
+        var fetched = await _fetchUserInfo(token);
+        return fetched ? true : false;
+      case 403:
+        // TODO - reauthenticate routine
+        return false;
+      case 409:
+        throw ConflictException('Email already exists. Choose another one');
+      case 500:
+        throw ServerException('Oops...something is wrong with the server!');
+      default:
+        throw ServerException('Server responded with unexpected code: ' +
+            result.statusCode.toString());
+    }
+  }
+
+  Future<bool> _fetchUserInfo(String token) async {
     var result = await http.get(Uri.https(ApiUtils.API_BASE, 'api/user/me'),
         headers: {'authorization': token});
 

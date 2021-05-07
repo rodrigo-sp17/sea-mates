@@ -2,8 +2,10 @@ import 'dart:ui';
 
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/auth_user.dart';
+import 'package:sea_mates/exception/rest_exceptions.dart';
 import 'package:sea_mates/model/user_model.dart';
 
 class ProfileView extends StatefulWidget {
@@ -123,6 +125,7 @@ class _ProfileViewState extends State<ProfileView> {
               onPressed: _submitChanges,
               child: Text("SAVE CHANGES")),
         ];
+        editing = true;
         ctrl.text = result!;
       });
     }
@@ -130,13 +133,29 @@ class _ProfileViewState extends State<ProfileView> {
 
   void _submitChanges() async {
     setState(() {
-      submitting = true;
       actions = [];
     });
 
-    // TODO - submit
+    _showLoadingDialog(context);
+    await Provider.of<UserModel>(context, listen: false)
+        .editUser(_usernameController.text, _emailController.text)
+        .then((success) {
+      if (!success) {
+        _showErrorDialog(context, 'Ops...', 'Edition failed!');
+      }
+    }).catchError((e) {
+      if (e is ConflictException) {
+        _showErrorDialog(context, 'Edition failed',
+            'The email already exists. Please choose another one');
+      } else {
+        _showErrorDialog(
+            context, 'Edition failed', 'Unexpected server response');
+      }
+    });
+    Navigator.pop(context);
+
     setState(() {
-      submitting = false;
+      editing = false;
     });
   }
 
@@ -161,12 +180,12 @@ class _ProfileViewState extends State<ProfileView> {
               child: Icon(Icons.person_sharp),
             ),
             Consumer<UserModel>(builder: (context, model, child) {
-              if (model.userStatus == UserStatus.AUTH) {
+              if (model.userStatus == UserStatus.AUTH && editing == false) {
                 AuthenticatedUser user = model.user as AuthenticatedUser;
                 _usernameController.text = user.username;
                 _nameController.text = user.name;
                 _emailController.text = user.email;
-              } else {
+              } else if (model.userStatus == UserStatus.LOCAL) {
                 return Center(
                   child: Text(
                     'Logged as Local User',
@@ -282,6 +301,27 @@ class _ProfileViewState extends State<ProfileView> {
       ],
     );
   }
+}
+
+void _showErrorDialog(BuildContext context, String title, String content) {
+  showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+            title: Text(title),
+            content: SingleChildScrollView(
+              child: Text(content),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context), child: Text('OK'))
+            ],
+          ));
+}
+
+void _showLoadingDialog(BuildContext context) {
+  showDialog(
+      context: context,
+      builder: (_) => AlertDialog(content: CircularProgressIndicator()));
 }
 
 void _showLogoutDialog(BuildContext context) {
