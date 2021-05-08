@@ -14,6 +14,7 @@ class ShiftView extends StatefulWidget {
 }
 
 class _ShiftViewState extends State<ShiftView> {
+  // TODO - extract state to parent
   Set<int> selectedIndexes = <int>{};
 
   // AppBar state
@@ -68,7 +69,7 @@ class _ShiftViewState extends State<ShiftView> {
     deleteResult.then((value) {
       _showSnackbar(context, "Deleted!", 1);
       _resetSelection();
-    }, onError: (error) => _showSnackbar(context, error.message));
+    }, onError: (error) => _showSnackbar(context, error.toString()));
   }
 
   @override

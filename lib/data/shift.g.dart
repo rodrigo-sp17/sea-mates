@@ -17,12 +17,12 @@ class ShiftAdapter extends TypeAdapter<Shift> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Shift(
+      unavailabilityStartDate: fields[0] as DateTime?,
       boardingDate: fields[1] as DateTime?,
       leavingDate: fields[2] as DateTime?,
+      unavailabilityEndDate: fields[3] as DateTime?,
       syncStatus: fields[4] as SyncStatus?,
-    )
-      ..unavailabilityStartDate = fields[0] as DateTime
-      ..unavailabilityEndDate = fields[3] as DateTime;
+    );
   }
 
   @override
@@ -58,24 +58,26 @@ class ShiftAdapter extends TypeAdapter<Shift> {
 
 Shift _$ShiftFromJson(Map<String, dynamic> json) {
   return Shift(
-    id: json['id'] as int?,
+    unavailabilityStartDate: json['unavailabilityStartDate'] == null
+        ? null
+        : DateTime.parse(json['unavailabilityStartDate'] as String),
     boardingDate: json['boardingDate'] == null
         ? null
         : DateTime.parse(json['boardingDate'] as String),
     leavingDate: json['leavingDate'] == null
         ? null
         : DateTime.parse(json['leavingDate'] as String),
+    unavailabilityEndDate: json['unavailabilityEndDate'] == null
+        ? null
+        : DateTime.parse(json['unavailabilityEndDate'] as String),
   )
-    ..unavailabilityStartDate =
-        DateTime.parse(json['unavailabilityStartDate'] as String)
-    ..unavailabilityEndDate =
-        DateTime.parse(json['unavailabilityEndDate'] as String)
-    ..cycleDays = json['cycleDays'] as int
-    ..repeat = json['repeat'] as int;
+    ..id = json['shiftId'] as int?
+    ..cycleDays = json['cycleDays'] as int?
+    ..repeat = json['repeat'] as int?;
 }
 
 Map<String, dynamic> _$ShiftToJson(Shift instance) => <String, dynamic>{
-      'id': instance.id,
+      'shiftId': instance.id,
       'unavailabilityStartDate':
           instance.unavailabilityStartDate.toIso8601String(),
       'boardingDate': instance.boardingDate.toIso8601String(),

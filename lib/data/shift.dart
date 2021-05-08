@@ -7,6 +7,7 @@ part 'shift.g.dart';
 @JsonSerializable()
 @HiveType(typeId: 0)
 class Shift {
+  @JsonKey(name: 'shiftId')
   int? id;
 
   @HiveField(0)
@@ -25,21 +26,35 @@ class Shift {
   @HiveField(4)
   SyncStatus syncStatus;
 
-  int cycleDays = 0;
-  int repeat = 0;
+  int? cycleDays = 0;
+  int? repeat = 0;
 
-  Shift(
-      {this.id,
-      DateTime? unStartDate,
-      DateTime? boardingDate,
-      DateTime? leavingDate,
-      DateTime? unEndDate,
-      SyncStatus? syncStatus})
-      : unavailabilityStartDate = unStartDate ?? DateTime.now(),
+  Shift({
+    DateTime? unavailabilityStartDate,
+    DateTime? boardingDate,
+    DateTime? leavingDate,
+    DateTime? unavailabilityEndDate,
+    SyncStatus? syncStatus,
+  })  : this.syncStatus = syncStatus ?? SyncStatus.UNSYNC,
+        this.unavailabilityStartDate =
+            unavailabilityStartDate ?? DateTime.now(),
         this.boardingDate = boardingDate ?? DateTime.now(),
         this.leavingDate = leavingDate ?? DateTime.now(),
-        unavailabilityEndDate = unEndDate ?? DateTime.now(),
-        this.syncStatus = syncStatus ?? SyncStatus.UNSYNC;
+        this.unavailabilityEndDate = unavailabilityEndDate ?? DateTime.now();
+
+  Shift.id(
+    this.id,
+    this.unavailabilityStartDate,
+    this.boardingDate,
+    this.leavingDate,
+    this.unavailabilityEndDate,
+    this.syncStatus,
+  );
+
+  factory Shift.empty() {
+    return Shift.id(null, DateTime.now(), DateTime.now(), DateTime.now(),
+        DateTime.now(), SyncStatus.UNSYNC);
+  }
 
   factory Shift.fromJson(Map<String, dynamic> json) => _$ShiftFromJson(json);
   Map<String, dynamic> toJson() => _$ShiftToJson(this);

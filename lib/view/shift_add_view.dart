@@ -25,7 +25,7 @@ class ShiftForm extends StatefulWidget {
 }
 
 class _ShiftFormState extends State<StatefulWidget> {
-  Shift _shift = new Shift();
+  Shift _shift = Shift.empty();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late FocusNode _unStartDate,
