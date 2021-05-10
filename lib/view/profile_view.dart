@@ -246,7 +246,6 @@ class _ProfileViewState extends State<ProfileView> {
                       ElevatedButton(
                         child: Text(
                           'LOGOUT',
-                          textScaleFactor: 1.2,
                         ),
                         onPressed: () => _showLogoutDialog(context),
                       ),
@@ -265,7 +264,6 @@ class _ProfileViewState extends State<ProfileView> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
-                          textScaleFactor: 1.2,
                         ),
                         onPressed: () => _deleteAccount(),
                       ),
