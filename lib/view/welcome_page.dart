@@ -23,12 +23,7 @@ class WelcomePage extends StatelessWidget {
               ),
               ElevatedButton(
                   onPressed: () {
-                    // retrieve info, send to endpoint to process
-                    // go to socialSignup
-                    // or save token
-                    showDialog(
-                        context: context,
-                        builder: (_) => SimpleDialog(title: Text('Soon...')));
+                    Navigator.pushNamed(context, '/oauth2');
                   },
                   child: Text("Continue with Facebook")),
               ElevatedButton(

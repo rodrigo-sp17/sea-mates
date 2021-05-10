@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:sea_mates/model/shift_list_model.dart';
 import 'package:sea_mates/model/user_model.dart';
 
-class Login extends StatelessWidget {
+class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: LoginForm());

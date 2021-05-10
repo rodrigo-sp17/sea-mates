@@ -7,6 +7,7 @@ import 'package:logging/logging.dart';
 import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/data/auth_user.dart';
 import 'package:sea_mates/data/local_user.dart';
+import 'package:sea_mates/data/social_user.dart';
 import 'package:sea_mates/data/user.dart';
 import 'package:sea_mates/data/user_request.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
@@ -65,6 +66,70 @@ class UserModel extends ChangeNotifier {
       throw Exception("User is local");
     } else {
       return (_user as AuthenticatedUser).token;
+    }
+  }
+
+  Future socialSignup(SocialUser user) async {
+    _loaded = false;
+    notifyListeners();
+
+    log.info(user.toString());
+    var uri = Uri.https(ApiUtils.API_BASE, '/api/user/socialSignup');
+    var headers = {"content-type": "application/json"};
+    var response = await http
+        .post(uri, headers: headers, body: jsonEncode(user))
+        .timeout(Duration(seconds: 15), onTimeout: () {
+      throw TimeoutException(
+          'Could not connect to server. Please check your internet connection');
+    }).catchError((e) {
+      log.warning(e);
+      throw e;
+    }).whenComplete(() {
+      _loaded = true;
+      notifyListeners();
+    });
+
+    bool answer = false;
+    Exception? error;
+    switch (response.statusCode) {
+      case 201:
+        String token = response.headers['authorization']!;
+        answer = await socialLogin(token);
+        break;
+      case 400:
+        error = BadRequestException('Invalid data');
+        break;
+      case 409:
+        var body = response.body;
+        bool username = body.contains('username');
+        bool email = body.contains('email');
+        String msg = "";
+        if (username && email) {
+          msg = 'The username and email already exist';
+        } else if (username) {
+          msg = 'The username already exists';
+        } else {
+          msg = 'The email already exists';
+        }
+        error = ConflictException(msg);
+        break;
+      case 500:
+        log.severe('${response.headers}\n ${response.body}');
+        error = ServerException('Ops, something is wrong with the server!');
+        break;
+      default:
+        log.warning(
+            '${response.statusCode}: ${response.headers}\n ${response.body}');
+        error = ServerException('Ops, the server responded unexpectedly!');
+    }
+
+    _loaded = true;
+    notifyListeners();
+
+    if (error != null) {
+      throw error;
+    } else {
+      return answer;
     }
   }
 
@@ -127,6 +192,18 @@ class UserModel extends ChangeNotifier {
       throw error;
     } else {
       return answer;
+    }
+  }
+
+  Future<bool> socialLogin(String token) async {
+    _loaded = false;
+    notifyListeners();
+
+    var hasUserInfo = await _fetchUserInfo(token);
+    if (hasUserInfo) {
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -325,6 +402,8 @@ class UserModel extends ChangeNotifier {
       await load();
       return true;
     } else {
+      _loaded = true;
+      notifyListeners();
       return false;
     }
   }
