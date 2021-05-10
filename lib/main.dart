@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/auth_user.dart';
 import 'package:sea_mates/data/shift.dart';
@@ -21,6 +22,11 @@ void main() async {
   Hive.registerAdapter(ShiftAdapter());
   Hive.registerAdapter(SyncStatusAdapter());
   Hive.registerAdapter(AuthenticatedUserAdapter());
+
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    print('${record.level.name}: ${record.time}: ${record.message}');
+  });
 
   var userModel = UserModel(UserHiveRepository());
   var shiftListModel = ShiftListModel(ShiftWebClient(), ShiftHiveRepository());

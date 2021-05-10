@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
@@ -8,18 +7,16 @@ import 'package:sea_mates/data/auth_user.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
 import 'package:sea_mates/model/user_model.dart';
 
+import '../validators.dart';
+
 class ProfileView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _ProfileViewState();
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  bool submitting = false;
   bool editing = false;
   List<Widget> actions = [];
-
-  final usernameRegexp = RegExp(r"^[a-zA-Z0-9]+([_@#&-]?[a-zA-Z0-9 ])*$");
-  final nameRegexp = RegExp(r"^([^0-9{}\\/()\]\[]*)$");
 
   final _usernameController = TextEditingController();
   final _nameController = TextEditingController();
@@ -39,44 +36,6 @@ class _ProfileViewState extends State<ProfileView> {
     _nameController.dispose();
     _emailController.dispose();
     super.dispose();
-  }
-
-/*  String? _validateUsername(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Username is mandatory";
-    }
-    int size = value.length;
-    if (size < 6 || size > 30) {
-      return "Username must be between 6 and 30 characters";
-    }
-    if (!usernameRegexp.hasMatch(value)) {
-      return "Invalid username";
-    }
-    return null;
-  }*/
-
-  String? _validateName(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Name is mandatory";
-    }
-    int size = value.length;
-    if (size > 60) {
-      return "Names should be 60 characters or less";
-    }
-    if (!nameRegexp.hasMatch(value)) {
-      return "Invalid name";
-    }
-    return null;
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Email is mandatory";
-    }
-    if (!EmailValidator.validate(value)) {
-      return "Invalid email";
-    }
-    return null;
   }
 
   void _editValue(
@@ -136,7 +95,6 @@ class _ProfileViewState extends State<ProfileView> {
       actions = [];
     });
 
-    _showLoadingDialog(context);
     await Provider.of<UserModel>(context, listen: false)
         .editUser(_usernameController.text, _emailController.text)
         .then((success) {
@@ -157,6 +115,28 @@ class _ProfileViewState extends State<ProfileView> {
     setState(() {
       editing = false;
     });
+  }
+
+  void _deleteAccount() async {
+    var password = await _showDeletionDialog(context);
+    if (password != null) {
+      await Provider.of<UserModel>(context, listen: false)
+          .deleteAccount(password)
+          .then((success) {
+        if (success) {
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/welcome', (route) => false);
+        } else {
+          _showErrorDialog(context, 'Deletion failed',
+              'Sorry, the deletion was not authorized');
+        }
+      }).catchError((e) {
+        if (e is RestException) {
+          _showErrorDialog(context, "Deletion failed",
+              'Sorry, deletion could not be performed at this moment. Could you try logging in again?');
+        }
+      });
+    }
   }
 
   @override
@@ -218,7 +198,8 @@ class _ProfileViewState extends State<ProfileView> {
                         suffixIcon: IconButton(
                           icon: Icon(Icons.edit),
                           onPressed: () {
-                            _editValue(_nameController, _validateName);
+                            _editValue(
+                                _nameController, Validators.validateName);
                           },
                         )),
                   ),
@@ -234,13 +215,14 @@ class _ProfileViewState extends State<ProfileView> {
                         suffixIcon: IconButton(
                           icon: Icon(Icons.edit),
                           onPressed: () {
-                            _editValue(_emailController, _validateEmail);
+                            _editValue(
+                                _emailController, Validators.validateEmail);
                           },
                         )),
                   ),
                   sizedBox,
                   Visibility(
-                      visible: submitting,
+                      visible: !model.loaded,
                       child: SizedBox(
                         height: 90,
                         child: Center(child: CircularProgressIndicator()),
@@ -253,6 +235,9 @@ class _ProfileViewState extends State<ProfileView> {
               thickness: 3,
             ),
             Consumer<UserModel>(builder: (context, model, child) {
+              if (!model.loaded) {
+                return sizedBox;
+              }
               switch (model.userStatus) {
                 case UserStatus.AUTH:
                   return Column(
@@ -282,9 +267,7 @@ class _ProfileViewState extends State<ProfileView> {
                           ),
                           textScaleFactor: 1.2,
                         ),
-                        onPressed: () {
-                          // TODO - delete account
-                        },
+                        onPressed: () => _deleteAccount(),
                       ),
                     ],
                   );
@@ -318,12 +301,6 @@ void _showErrorDialog(BuildContext context, String title, String content) {
           ));
 }
 
-void _showLoadingDialog(BuildContext context) {
-  showDialog(
-      context: context,
-      builder: (_) => AlertDialog(content: CircularProgressIndicator()));
-}
-
 void _showLogoutDialog(BuildContext context) {
   showDialog(
       context: context,
@@ -345,7 +322,50 @@ void _showLogoutDialog(BuildContext context) {
                     Navigator.pushNamedAndRemoveUntil(
                         context, '/welcome', (_) => false);
                   },
-                  child: Text('YES, LOG ME OUT!'))
+                  child: Text('YES, LOG ME OUT'))
             ],
           ));
+}
+
+Future<String?> _showDeletionDialog(BuildContext context) async {
+  String? password = "";
+
+  var value = await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+            scrollable: true,
+            title: Text("Account deletion"),
+            content: Column(
+              children: [
+                Text(
+                    'This actions is permanent.\nPlease confirm your password on the field below to allow deletion:'),
+                TextFormField(
+                  keyboardType: TextInputType.visiblePassword,
+                  textInputAction: TextInputAction.done,
+                  obscureText: true,
+                  autofillHints: [AutofillHints.password],
+                  onChanged: (value) {
+                    password = value;
+                  },
+                  onFieldSubmitted: (value) {
+                    password = value;
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('CANCEL'),
+              ),
+              TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text('YES, DELETE MY ACCOUNT'))
+            ],
+          ));
+  if (value) {
+    return password;
+  } else {
+    return null;
+  }
 }

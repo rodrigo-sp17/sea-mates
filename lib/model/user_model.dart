@@ -111,12 +111,12 @@ class UserModel extends ChangeNotifier {
         error = ConflictException(msg);
         break;
       case 500:
-        log.severe(response.body);
+        log.severe('${response.headers}\n ${response.body}');
         error = ServerException('Ops, something is wrong with the server!');
         break;
       default:
-        log.warning(response.statusCode);
-        log.warning(response.headers);
+        log.warning(
+            '${response.statusCode}: ${response.headers}\n ${response.body}');
         error = ServerException('Ops, the server responded unexpectedly!');
     }
 
@@ -136,8 +136,17 @@ class UserModel extends ChangeNotifier {
 
     var uri = Uri.https(ApiUtils.API_BASE, '/login');
     Map<String, String> body = {"username": username, "password": password};
-    var response = await http.post(uri,
-        body: jsonEncode(body), headers: {"content-type": "application/json"});
+    var response = await http.post(uri, body: jsonEncode(body), headers: {
+      "content-type": "application/json"
+    }).timeout(Duration(seconds: 15), onTimeout: () {
+      _loaded = true;
+      notifyListeners();
+      throw TimeoutException('Request timed out');
+    }).catchError((e) {
+      _loaded = true;
+      notifyListeners();
+      throw e;
+    });
 
     String? error;
     bool answer = false;
@@ -185,6 +194,8 @@ class UserModel extends ChangeNotifier {
 
   Future<bool> editUser(String name, String email) async {
     assert(email.isNotEmpty);
+    _loaded = false;
+    notifyListeners();
 
     var user = _user as AuthenticatedUser;
     var token = user.token;
@@ -192,28 +203,106 @@ class UserModel extends ChangeNotifier {
       "userId": user.id.toString(),
       "name": name,
     };
+
+    // this check is needed since the server throws conflict
+    // if we send the unchanged email
     if (user.email != email) {
       body['email'] = email;
     }
 
-    var result = await http.put(Uri.https(ApiUtils.API_BASE, 'api/user'),
-        headers: {'authorization': token, 'content-type': 'application/json'},
-        body: jsonEncode(body));
+    var result = await http
+        .put(Uri.https(ApiUtils.API_BASE, 'api/user'),
+            headers: {
+              'authorization': token,
+              'content-type': 'application/json'
+            },
+            body: jsonEncode(body))
+        .timeout(Duration(seconds: 15))
+        .catchError((e) {
+      log.warning(e);
+      _loaded = true;
+      notifyListeners();
+      throw e;
+    });
 
+    bool answer = false;
+    Exception? error;
     switch (result.statusCode) {
       case 200:
         var fetched = await _fetchUserInfo(token);
-        return fetched ? true : false;
+        answer = fetched ? true : false;
+        break;
       case 403:
-        // TODO - reauthenticate routine
-        return false;
+        // TODO - reauthentication routine
+        answer = false;
+        break;
       case 409:
-        throw ConflictException('Email already exists. Choose another one');
+        error = ConflictException('Email already exists. Choose another one');
+        break;
       case 500:
-        throw ServerException('Oops...something is wrong with the server!');
+        log.severe('${result.headers}\n ${result.body}');
+        error = ServerException('Oops...something is wrong with the server!');
+        break;
       default:
-        throw ServerException('Server responded with unexpected code: ' +
-            result.statusCode.toString());
+        log.warning('${result.statusCode}: ${result.headers}\n ${result.body}');
+        error = ServerException('Ops, the server responded unexpectedly!');
+    }
+
+    _loaded = true;
+    notifyListeners();
+
+    if (error != null) {
+      throw error;
+    } else {
+      return answer;
+    }
+  }
+
+  Future<bool> deleteAccount(String password) async {
+    _loaded = false;
+    notifyListeners();
+    var uri = Uri.https(ApiUtils.API_BASE, 'api/user/delete');
+    var headers = {
+      "Authorization": getToken(),
+      "content-type": "application/json",
+      "password": password
+    };
+    var response = await http
+        .delete(uri, headers: headers)
+        .timeout(Duration(seconds: 15), onTimeout: () {
+      _loaded = true;
+      notifyListeners();
+      throw TimeoutException(
+          'Could not connect to server. Please check your internet connection');
+    }).catchError((e) {
+      log.warning(e);
+      _loaded = true;
+      notifyListeners();
+      throw e;
+    });
+
+    bool answer = false;
+    Exception? error;
+    switch (response.statusCode) {
+      case 204:
+        answer = true;
+        break;
+      case 403:
+        answer = false;
+        break;
+      default:
+        log.warning(
+            '${response.statusCode}: ${response.headers}\n ${response.body}');
+        error = ServerException('Ops, the server responded unexpectedly!');
+    }
+
+    _loaded = true;
+    notifyListeners();
+
+    if (error != null) {
+      throw error;
+    } else {
+      return answer;
     }
   }
 
