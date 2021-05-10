@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:logging/logging.dart';
 import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/data/auth_user.dart';
 import 'package:sea_mates/data/local_user.dart';
@@ -12,6 +14,8 @@ import 'package:sea_mates/model/shift_list_model.dart';
 import 'package:sea_mates/repository/user_repository.dart';
 
 class UserModel extends ChangeNotifier {
+  final log = Logger('UserModel');
+
   final UserRepository userRepository;
   late ShiftListModel shiftListModel;
 
@@ -64,8 +68,66 @@ class UserModel extends ChangeNotifier {
     }
   }
 
-  Future<void> signup(UserRequest request) async {
-    // TODO
+  Future<bool> signup(UserRequest request) async {
+    _loaded = false;
+    notifyListeners();
+
+    var uri = Uri.https(ApiUtils.API_BASE, '/api/user/signup');
+    var headers = {"content-type": "application/json"};
+    var response = await http
+        .post(uri, headers: headers, body: jsonEncode(request))
+        .timeout(Duration(seconds: 15), onTimeout: () {
+      _loaded = true;
+      notifyListeners();
+      throw TimeoutException(
+          'Could not connect to server. Please check your internet connection');
+    });
+
+    bool answer = false;
+    Exception? error;
+    switch (response.statusCode) {
+      case 201:
+        answer = true;
+        break;
+      case 400:
+        error = BadRequestException('Invalid data');
+        break;
+      case 403:
+        answer = false;
+        break;
+      case 409:
+        var body = response.body;
+        bool username = body.contains('username');
+        bool email = body.contains('email');
+        String msg = "";
+
+        if (username && email) {
+          msg = 'The username and email already exist';
+        } else if (username) {
+          msg = 'The username already exists';
+        } else {
+          msg = 'The email already exists';
+        }
+        error = ConflictException(msg);
+        break;
+      case 500:
+        log.severe(response.body);
+        error = ServerException('Ops, something is wrong with the server!');
+        break;
+      default:
+        log.warning(response.statusCode);
+        log.warning(response.headers);
+        error = ServerException('Ops, the server responded unexpectedly!');
+    }
+
+    _loaded = true;
+    notifyListeners();
+
+    if (error != null) {
+      throw error;
+    } else {
+      return answer;
+    }
   }
 
   Future<bool> login(String username, String password) async {

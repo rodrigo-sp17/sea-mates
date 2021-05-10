@@ -42,7 +42,7 @@ class WelcomePage extends StatelessWidget {
               ),
               ElevatedButton(
                   onPressed: () {
-                    // push signup
+                    Navigator.pushNamed(context, '/signup');
                   },
                   child: Text("Signup")),
               Divider(

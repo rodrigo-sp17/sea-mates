@@ -11,6 +11,7 @@ import 'package:sea_mates/repository/impl/shift_web_client.dart';
 import 'package:sea_mates/repository/impl/user_hive_repo.dart';
 import 'package:sea_mates/view/home.dart';
 import 'package:sea_mates/view/login.dart';
+import 'package:sea_mates/view/signup_page.dart';
 import 'package:sea_mates/view/welcome.dart';
 
 import 'model/shift_list_model.dart';
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
               '/welcome': (context) => WelcomePage(),
               '/home': (context) => HomePage(),
               '/login': (context) => Login(),
+              '/signup': (context) => SignupPage(),
             }));
   }
 }
