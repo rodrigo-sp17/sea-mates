@@ -53,8 +53,13 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
             title: 'Flutter Demo',
             theme: ThemeData(
-              primarySwatch: Colors.blue,
-            ),
+                primarySwatch: Colors.indigo,
+                elevatedButtonTheme: ElevatedButtonThemeData(
+                    style: ButtonStyle(
+                        minimumSize:
+                            MaterialStateProperty.all(Size.fromHeight(45)),
+                        textStyle: MaterialStateProperty.all(TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold))))),
             home: Consumer<UserModel>(
               builder: (context, model, child) {
                 if (model.userStatus != UserStatus.ANONYMOUS) {

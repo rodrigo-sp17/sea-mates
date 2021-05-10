@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_signin_button/button_list.dart';
+import 'package:flutter_signin_button/button_view.dart';
 import 'package:provider/provider.dart';
+import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/model/user_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WelcomePage extends StatelessWidget {
   @override
@@ -18,53 +22,73 @@ class WelcomePage extends StatelessWidget {
                 height: 220,
                 child: Text('Logo placeholder'),
               ),
+              ConstrainedBox(
+                constraints: BoxConstraints.tightFor(height: 45),
+                child: SignInButton(Buttons.Facebook,
+                    text: 'Continue with Facebook',
+                    onPressed: () => Navigator.pushNamed(context, '/oauth2')),
+              ),
               SizedBox(
                 height: 15,
               ),
               ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/oauth2');
-                  },
-                  child: Text("Continue with Facebook")),
-              ElevatedButton(
-                  onPressed: () {
                     Navigator.pushNamed(context, '/login');
                   },
-                  child: Text("Login")),
+                  child: Text("Login with email")),
               Divider(
                 height: 20,
-                thickness: 2,
+                thickness: 0,
               ),
               ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.amber)),
                   onPressed: () {
                     Navigator.pushNamed(context, '/signup');
                   },
                   child: Text("Signup")),
               Divider(
                 height: 20,
-                thickness: 2,
+                thickness: 0,
               ),
               Consumer<UserModel>(builder: (context, model, child) {
                 switch (model.userStatus) {
                   case UserStatus.ANONYMOUS:
                     return ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.grey)),
                         onPressed: () {
                           _showLocalUserDialog(context);
                         },
                         child: Text("Continue offline"));
                   case UserStatus.LOCAL:
                     return ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.grey)),
                         onPressed: () => Navigator.pushNamed(context, '/home'),
                         child: Text("Remain in local mode"));
                   case UserStatus.AUTH:
                     return ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.grey)),
                       onPressed: () => _showLogoutDialog(context),
                       child: Text("Logout"),
                     );
                   default:
                     throw AssertionError("Unrecognized user status");
                 }
-              })
+              }),
+              SizedBox(
+                height: 15,
+              ),
+              TextButton(
+                onPressed: () => launch(
+                    Uri.https(ApiUtils.API_BASE, '/recovery').toString()),
+                child: Text('Forgot your password?'),
+              )
             ],
           ))),
     );
