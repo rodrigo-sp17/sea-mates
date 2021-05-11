@@ -13,6 +13,18 @@ class ConflictException extends RestException {
   ConflictException(this.message);
 }
 
+class RedirectionException extends RestException {
+  String message;
+
+  RedirectionException(this.message);
+}
+
+class NotFoundException extends RestException {
+  String message;
+
+  NotFoundException(this.message);
+}
+
 class ServerException extends RestException {
   String message;
 

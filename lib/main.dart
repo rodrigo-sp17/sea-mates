@@ -6,7 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:sea_mates/data/auth_user.dart';
 import 'package:sea_mates/data/shift.dart';
 import 'package:sea_mates/data/sync_status.dart';
+import 'package:sea_mates/model/friend_list_model.dart';
 import 'package:sea_mates/model/user_model.dart';
+import 'package:sea_mates/repository/impl/friends_web_client.dart';
 import 'package:sea_mates/repository/impl/shift_hive_repository.dart';
 import 'package:sea_mates/repository/impl/shift_web_client.dart';
 import 'package:sea_mates/repository/impl/user_hive_repo.dart';
@@ -34,21 +36,25 @@ void main() async {
   var shiftListModel = ShiftListModel(ShiftWebClient(), ShiftHiveRepository());
   shiftListModel.update(userModel);
   userModel.update(shiftListModel);
+  var friendListModel = FriendListModel(FriendsWebClient());
+  friendListModel.update(userModel);
 
-  runApp(MyApp(userModel, shiftListModel));
+  runApp(MyApp(userModel, shiftListModel, friendListModel));
 }
 
 class MyApp extends StatelessWidget {
-  MyApp(this.userModel, this.shiftListModel);
+  MyApp(this.userModel, this.shiftListModel, this.friendListModel);
   final UserModel userModel;
   final ShiftListModel shiftListModel;
+  final FriendListModel friendListModel;
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
         providers: [
           ChangeNotifierProvider.value(value: userModel),
-          ChangeNotifierProvider.value(value: shiftListModel)
+          ChangeNotifierProvider.value(value: shiftListModel),
+          ChangeNotifierProvider.value(value: friendListModel)
         ],
         child: MaterialApp(
             title: 'Flutter Demo',
