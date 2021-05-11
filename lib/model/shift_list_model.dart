@@ -10,18 +10,18 @@ import 'package:sea_mates/repository/shift_local_repository.dart';
 import 'package:sea_mates/repository/shift_remote_repository.dart';
 
 class ShiftListModel extends ChangeNotifier {
-  final ShiftRemoteRepository shiftRemoteRepository;
-  final ShiftLocalRepository shiftLocalRepository;
-  late UserModel userModel;
+  final ShiftRemoteRepository _shiftRemoteRepository;
+  final ShiftLocalRepository _shiftLocalRepository;
+  late UserModel _userModel;
 
   List<Shift> _shifts;
 
-  ShiftListModel(this.shiftRemoteRepository, this.shiftLocalRepository,
+  ShiftListModel(this._shiftRemoteRepository, this._shiftLocalRepository,
       {List<Shift>? shifts})
       : _shifts = shifts ?? [];
 
   ShiftListModel update(UserModel userModel) {
-    this.userModel = userModel;
+    this._userModel = userModel;
     return this;
   }
 
@@ -31,14 +31,14 @@ class ShiftListModel extends ChangeNotifier {
   /// Syncs shifts
   /// To be called at app initialization and upon user request
   Future syncShifts() async {
-    if (!userModel.hasAuthentication()) {
+    if (!_userModel.hasAuthentication()) {
       return Future.error(
           "Synchronization is only possible when authenticated");
     }
-    var token = userModel.getToken();
+    var token = _userModel.getToken();
 
-    var localShifts = await shiftLocalRepository.loadLocal();
-    var remoteShifts = await shiftRemoteRepository.loadRemote(token);
+    var localShifts = await _shiftLocalRepository.loadLocal();
+    var remoteShifts = await _shiftRemoteRepository.loadRemote(token);
 
     var unsyncedShifts = <Shift>[];
     localShifts.forEach((shift) {
@@ -48,20 +48,20 @@ class ShiftListModel extends ChangeNotifier {
     });
 
     // Replaces local data for remote data
-    await shiftLocalRepository.removeLocal(localShifts.map((s) => s.id!));
-    await shiftLocalRepository.saveLocal(remoteShifts);
+    await _shiftLocalRepository.removeLocal(localShifts.map((s) => s.id!));
+    await _shiftLocalRepository.saveLocal(remoteShifts);
 
     // Adds pending shifts to the server
-    List<Shift> added = await shiftRemoteRepository
+    List<Shift> added = await _shiftRemoteRepository
         .addRemote(unsyncedShifts, token)
         .catchError((e) {
       // avoids losing the unsynced ones
-      shiftLocalRepository.addLocal(unsyncedShifts);
+      _shiftLocalRepository.addLocal(unsyncedShifts);
       throw e;
     });
 
-    await shiftLocalRepository.addLocal(added);
-    _shifts = await shiftLocalRepository.loadLocal();
+    await _shiftLocalRepository.addLocal(added);
+    _shifts = await _shiftLocalRepository.loadLocal();
     notifyListeners();
   }
 
@@ -69,7 +69,7 @@ class ShiftListModel extends ChangeNotifier {
   /// Syncs only upon user request
   Future<void> add(Shift shift) async {
     shift.syncStatus = SyncStatus.UNSYNC;
-    var addedShift = await shiftLocalRepository
+    var addedShift = await _shiftLocalRepository
         .addLocal([shift]).then((value) => value.first);
     _shifts.add(addedShift);
     notifyListeners();
@@ -78,7 +78,7 @@ class ShiftListModel extends ChangeNotifier {
   /// Removes a shift
   /// Attempts remote deletions as soon as possible
   Future<void> remove(Set<int> indexes) async {
-    var token = userModel.getToken();
+    var token = _userModel.getToken();
     List<int> synced = [], unsynced = [];
     indexes.forEach((index) {
       var shift = _shifts.elementAt(index);
@@ -88,24 +88,24 @@ class ShiftListModel extends ChangeNotifier {
 
     // for un-synced
     if (unsynced.isNotEmpty) {
-      await shiftLocalRepository.removeLocal(unsynced);
-      _shifts = await shiftLocalRepository.loadLocal();
+      await _shiftLocalRepository.removeLocal(unsynced);
+      _shifts = await _shiftLocalRepository.loadLocal();
       notifyListeners();
     }
 
     // for synced - requires online access
-    if (synced.isNotEmpty && userModel.hasAuthentication()) {
-      await shiftRemoteRepository.removeRemote(synced, token).catchError((e) {
+    if (synced.isNotEmpty && _userModel.hasAuthentication()) {
+      await _shiftRemoteRepository.removeRemote(synced, token).catchError((e) {
         log(e.toString());
         throw Exception('Deletion failed! :(');
       });
-      await shiftLocalRepository.removeLocal(synced);
-      _shifts = await shiftLocalRepository.loadLocal();
+      await _shiftLocalRepository.removeLocal(synced);
+      _shifts = await _shiftLocalRepository.loadLocal();
       notifyListeners();
     }
   }
 
   Future<void> clearLocalDatabase() async {
-    await shiftLocalRepository.clear();
+    await _shiftLocalRepository.clear();
   }
 }
