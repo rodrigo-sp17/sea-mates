@@ -24,6 +24,12 @@ class _CalendarState extends State<CalendarView> {
   final unavailableDates =
       new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: getHashCode);
 
+  final unStartColor = Colors.amber;
+  final boardingColor = Colors.red;
+  final unavailableColor = Colors.grey;
+  final leavingColor = Colors.lightGreen;
+  final unEndColor = Colors.cyan;
+
   void _parseShifts(Iterable<Shift> shifts) {
     shifts.forEach((shift) {
       this.unavailabilityStartDates.add(shift.unavailabilityStartDate);
@@ -52,58 +58,68 @@ class _CalendarState extends State<CalendarView> {
               title: Text('Calendar'),
               pinned: true,
             ),
-            Consumer<ShiftListModel>(builder: (context, model, child) {
-              return FutureBuilder(
-                  future: model.shifts,
-                  builder: (context, AsyncSnapshot<List<Shift>> snapshot) {
-                    if (snapshot.hasData) {
-                      var shifts = snapshot.data!;
-                      _parseShifts(shifts);
-                      return SliverList(
-                          delegate:
-                              SliverChildBuilderDelegate((context, int index) {
-                        return TableCalendar(
-                            calendarBuilders: CalendarBuilders(
-                                prioritizedBuilder:
-                                    (context, DateTime day, focusedDay) {
-                              Color color = Colors.white;
-                              if (unavailabilityStartDates.contains(day)) {
-                                color = Colors.amber;
-                              } else if (boardingDates.contains(day)) {
-                                color = Colors.red;
-                              } else if (unavailableDates.contains(day)) {
-                                color = Colors.grey;
-                              } else if (unavailabilityEndDates.contains(day)) {
-                                color = Colors.cyan;
-                              } else if (leavingDates.contains(day)) {
-                                color = Colors.greenAccent;
-                              }
-                              return Container(
-                                alignment: Alignment.topCenter,
-                                decoration: BoxDecoration(color: color),
-                                child: Text(day.day.toString()),
-                              );
-                            }),
-                            focusedDay: DateTime.now(),
-                            firstDay:
-                                DateTime.now().subtract(Duration(days: 2000)),
-                            lastDay: DateTime.now().add(Duration(days: 2000)));
-                      }, childCount: 1));
-                    } else if (snapshot.hasError) {
-                      return SliverFillRemaining(
-                        child: Center(
-                          child: Text(
-                              "Oops...error loading shifts! Will handle soon!"),
-                        ),
-                      );
-                    } else {
-                      return SliverFillRemaining(
-                          child: Center(
-                        child: CircularProgressIndicator(),
-                      ));
-                    }
-                  });
-            }),
+            Consumer<ShiftListModel>(
+                builder: (context, model, child) {
+                  return FutureBuilder(
+                      future: model.shifts,
+                      builder: (context, AsyncSnapshot<List<Shift>> snapshot) {
+                        if (snapshot.hasData) {
+                          var shifts = snapshot.data!;
+                          _parseShifts(shifts);
+                          return SliverList(
+                              delegate: SliverChildListDelegate.fixed([
+                            TableCalendar(
+                                calendarBuilders: CalendarBuilders(
+                                    prioritizedBuilder:
+                                        (context, DateTime day, focusedDay) {
+                                  Color color = Colors.white;
+                                  if (boardingDates.contains(day)) {
+                                    color = boardingColor;
+                                  } else if (unavailabilityStartDates
+                                      .contains(day)) {
+                                    color = unStartColor;
+                                  } else if (unavailableDates.contains(day)) {
+                                    color = unavailableColor;
+                                  } else if (leavingDates.contains(day)) {
+                                    color = leavingColor;
+                                  } else if (unavailabilityEndDates
+                                      .contains(day)) {
+                                    color = unEndColor;
+                                  }
+                                  return Container(
+                                    alignment: Alignment.topCenter,
+                                    decoration: BoxDecoration(color: color),
+                                    child: Text(day.day.toString()),
+                                  );
+                                }),
+                                focusedDay: DateTime.now(),
+                                firstDay: DateTime.now()
+                                    .subtract(Duration(days: 2000)),
+                                lastDay:
+                                    DateTime.now().add(Duration(days: 2000))),
+                            child!
+                          ]));
+                        } else if (snapshot.hasError) {
+                          return SliverFillRemaining(
+                            child: Center(
+                              child: Text(
+                                  "Oops...error loading shifts! Will handle soon!"),
+                            ),
+                          );
+                        } else {
+                          return SliverFillRemaining(
+                              child: Center(
+                            child: CircularProgressIndicator(),
+                          ));
+                        }
+                      });
+                },
+                child: SubtitleTable(<Color, String>{
+                  unStartColor: 'Start of unavailability',
+                  boardingColor: 'Boarding day',
+                  leavingColor: 'Leaving day',
+                  unEndColor: 'End of unavailability'
+                })),
           ],
         ),
         Positioned(
@@ -119,6 +135,39 @@ class _CalendarState extends State<CalendarView> {
           ),
         )
       ],
+    );
+  }
+}
+
+class SubtitleTable extends StatelessWidget {
+  const SubtitleTable(this.entries);
+  final Map<Color, String> entries;
+
+  List<TableRow> getRows() {
+    List<TableRow> result = [];
+    entries.forEach((key, value) {
+      result.add(TableRow(
+        children: [
+          Container(
+            color: key,
+            height: 30,
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: Text(value),
+          )
+        ],
+      ));
+    });
+    return result;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Table(
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      columnWidths: {0: FixedColumnWidth(30), 1: FlexColumnWidth()},
+      children: getRows(),
     );
   }
 }
