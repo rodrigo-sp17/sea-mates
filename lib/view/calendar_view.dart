@@ -69,29 +69,36 @@ class _CalendarState extends State<CalendarView> {
                           return SliverList(
                               delegate: SliverChildListDelegate.fixed([
                             TableCalendar(
+                                headerStyle: HeaderStyle(
+                                  formatButtonVisible: false,
+                                ),
                                 calendarBuilders: CalendarBuilders(
-                                    prioritizedBuilder:
-                                        (context, DateTime day, focusedDay) {
-                                  Color color = Colors.white;
-                                  if (boardingDates.contains(day)) {
-                                    color = boardingColor;
-                                  } else if (unavailabilityStartDates
-                                      .contains(day)) {
-                                    color = unStartColor;
-                                  } else if (unavailableDates.contains(day)) {
-                                    color = unavailableColor;
-                                  } else if (leavingDates.contains(day)) {
-                                    color = leavingColor;
-                                  } else if (unavailabilityEndDates
-                                      .contains(day)) {
-                                    color = unEndColor;
-                                  }
-                                  return Container(
-                                    alignment: Alignment.topCenter,
-                                    decoration: BoxDecoration(color: color),
-                                    child: Text(day.day.toString()),
-                                  );
-                                }),
+                                  prioritizedBuilder:
+                                      (context, DateTime day, focusedDay) {
+                                    Color? color;
+                                    if (boardingDates.contains(day)) {
+                                      color = boardingColor;
+                                    } else if (unavailabilityStartDates
+                                        .contains(day)) {
+                                      color = unStartColor;
+                                    } else if (unavailableDates.contains(day)) {
+                                      color = unavailableColor;
+                                    } else if (leavingDates.contains(day)) {
+                                      color = leavingColor;
+                                    } else if (unavailabilityEndDates
+                                        .contains(day)) {
+                                      color = unEndColor;
+                                    }
+                                    return color == null
+                                        ? null
+                                        : Container(
+                                            alignment: Alignment.center,
+                                            decoration:
+                                                BoxDecoration(color: color),
+                                            child: Text(day.day.toString()),
+                                          );
+                                  },
+                                ),
                                 focusedDay: DateTime.now(),
                                 firstDay: DateTime.now()
                                     .subtract(Duration(days: 2000)),
