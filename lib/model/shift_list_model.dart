@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:sea_mates/data/shift.dart';
@@ -60,18 +59,19 @@ class ShiftListModel extends ChangeNotifier {
       throw e;
     });
 
-    await _shiftLocalRepository.addLocal(added);
+    await _shiftLocalRepository.saveLocal(added);
     _shifts = await _shiftLocalRepository.loadLocal();
     notifyListeners();
   }
 
   /// Adds a new shift
   /// Syncs only upon user request
+  /// WARNING: Mutates shift
   Future<void> add(Shift shift) async {
     shift.syncStatus = SyncStatus.UNSYNC;
-    var addedShift = await _shiftLocalRepository
-        .addLocal([shift]).then((value) => value.first);
-    _shifts.add(addedShift);
+    var shifts = _calculateRepetitions(shift);
+    var addedShifts = await _shiftLocalRepository.addLocal(shifts);
+    _shifts.addAll(addedShifts);
     notifyListeners();
   }
 
@@ -96,7 +96,6 @@ class ShiftListModel extends ChangeNotifier {
     // for synced - requires online access
     if (synced.isNotEmpty && _userModel.hasAuthentication()) {
       await _shiftRemoteRepository.removeRemote(synced, token).catchError((e) {
-        log(e.toString());
         throw Exception('Deletion failed! :(');
       });
       await _shiftLocalRepository.removeLocal(synced);
@@ -107,5 +106,52 @@ class ShiftListModel extends ChangeNotifier {
 
   Future<void> clearLocalDatabase() async {
     await _shiftLocalRepository.clear();
+  }
+
+  /// Calculates and returns the shifts representing the next cycles based upon
+  /// the repeat property of Shift
+  ///
+  /// The repeat property of the original shift is mutated to 0 to avoid
+  /// server duplications
+  ///
+  /// This method ignores the cycleDays properties - calculations are done based
+  /// on available dates
+  List<Shift> _calculateRepetitions(Shift shift) {
+    int times = shift.repeat!;
+    shift.repeat = 0;
+
+    var result = [shift];
+    if (times == 0) {
+      return result;
+    }
+
+    var cycleDays = shift.leavingDate.difference(shift.boardingDate).inDays;
+    var beforeDiff =
+        shift.boardingDate.difference(shift.unavailabilityStartDate).inDays;
+    var afterDiff =
+        shift.unavailabilityEndDate.difference(shift.leavingDate).inDays;
+
+    for (int i = 1; i <= times; i++) {
+      var nextBoardingDate =
+          shift.boardingDate.add(Duration(days: (i * 2 * cycleDays)));
+      var nextLeavingDate =
+          shift.leavingDate.add(Duration(days: (i * 2 * cycleDays)));
+      var nextUnStartDate =
+          nextBoardingDate.subtract(Duration(days: beforeDiff));
+      var nextUnEndDate = nextLeavingDate.add(Duration(days: afterDiff));
+
+      assert(!nextUnStartDate.isAfter(nextBoardingDate));
+      assert(!nextLeavingDate.isBefore(nextBoardingDate));
+      assert(!nextUnEndDate.isBefore(nextLeavingDate));
+
+      result.add(new Shift(
+          unavailabilityStartDate: nextUnStartDate,
+          boardingDate: nextBoardingDate,
+          leavingDate: nextLeavingDate,
+          unavailabilityEndDate: nextUnEndDate,
+          syncStatus: SyncStatus.UNSYNC));
+    }
+
+    return result;
   }
 }

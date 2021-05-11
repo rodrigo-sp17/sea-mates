@@ -353,7 +353,7 @@ class _ShiftFormState extends State<StatefulWidget> {
                         _calculateCycle();
                       },
                       onSaved: (value) {
-                        _shift.cycleDays = int.parse(value!);
+                        _shift.cycleDays = useCycle ? int.parse(value!) : null;
                       },
                     ))
               ],
