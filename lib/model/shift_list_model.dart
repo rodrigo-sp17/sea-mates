@@ -62,6 +62,7 @@ class ShiftListModel extends ChangeNotifier {
       remoteShifts = await _shiftRemoteRepository.loadRemote(token);
     } on ForbiddenException {
       errorMessage = 'Sync forbidden - please log in again';
+      _userModel.handleForbidden();
     } on RestException {
       errorMessage = "Failed to fetch data";
     }

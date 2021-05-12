@@ -57,6 +57,7 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider.value(value: friendListModel)
         ],
         child: MaterialApp(
+            navigatorKey: userModel.navigatorKey,
             title: 'Flutter Demo',
             theme: ThemeData(
                 primarySwatch: Colors.indigo,

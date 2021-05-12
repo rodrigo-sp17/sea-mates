@@ -59,7 +59,7 @@ class FriendListModel extends ChangeNotifier {
     } on TimeoutException {
       return 'Could not reach server. Are you online?';
     } on ForbiddenException {
-      // TODO - handle
+      _userModel.handleForbidden();
       return 'You are not unauthorized';
     } on ServerException {
       return "Sync failed!";
@@ -85,7 +85,7 @@ class FriendListModel extends ChangeNotifier {
     } on TimeoutException {
       return Future.error('Could not reach server. Are you online?');
     } on ForbiddenException {
-      // TODO - handle
+      _userModel.handleForbidden();
       return Future.error('You are not unauthorized');
     } on ServerException {
       return Future.error("Sync failed!");
@@ -109,7 +109,7 @@ class FriendListModel extends ChangeNotifier {
     } on TimeoutException {
       return 'Could not reach server. Are you online?';
     } on ForbiddenException {
-      // TODO - handle
+      _userModel.handleForbidden();
       return 'Request unauthorized';
     } on NotFoundException {
       return 'The user does not exist!';
@@ -141,7 +141,7 @@ class FriendListModel extends ChangeNotifier {
     } on TimeoutException {
       return 'Could not reach server. Are you online?';
     } on ForbiddenException {
-      // TODO - handle
+      _userModel.handleForbidden();
       return 'Request unauthorized';
     } on NotFoundException {
       return 'The request does not exist!';
@@ -174,7 +174,7 @@ class FriendListModel extends ChangeNotifier {
     } on TimeoutException {
       return 'Could not reach server. Are you online?';
     } on ForbiddenException {
-      // TODO - handle
+      _userModel.handleForbidden();
       return 'Request unauthorized';
     } on NotFoundException {
       return 'The friend does not exist!';

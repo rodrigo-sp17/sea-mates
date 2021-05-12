@@ -22,6 +22,8 @@ class UserModel extends ChangeNotifier {
   final UserRepository userRepository;
   late ShiftListModel shiftListModel;
   late FriendListModel friendListModel;
+  final GlobalKey<NavigatorState> navigatorKey =
+      new GlobalKey<NavigatorState>();
 
   UserModel(this.userRepository) {
     load();
@@ -170,6 +172,7 @@ class UserModel extends ChangeNotifier {
         break;
       case 403:
         answer = false;
+        handleForbidden();
         break;
       case 409:
         var body = response.body;
@@ -250,6 +253,7 @@ class UserModel extends ChangeNotifier {
         error = "Failed to fetch user info";
       }
     } else if (response.statusCode == 403 || response.statusCode == 401) {
+      handleForbidden();
       answer = false;
     } else {
       error = "Something seem wrong with the server...";
@@ -324,7 +328,7 @@ class UserModel extends ChangeNotifier {
         answer = fetched ? true : false;
         break;
       case 403:
-        // TODO - reauthentication routine
+        handleForbidden();
         answer = false;
         break;
       case 409:
@@ -380,6 +384,7 @@ class UserModel extends ChangeNotifier {
         break;
       case 403:
         answer = false;
+        handleForbidden();
         break;
       default:
         log.warning(
@@ -395,6 +400,12 @@ class UserModel extends ChangeNotifier {
     } else {
       return answer;
     }
+  }
+
+  /// Performs redirections in case of forbidden errors
+  void handleForbidden() {
+    navigatorKey.currentState!
+        .pushNamedAndRemoveUntil('/welcome', (_) => false);
   }
 
   Future<bool> _fetchUserInfo(String token) async {
