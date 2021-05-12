@@ -11,6 +11,7 @@ import 'package:sea_mates/data/social_user.dart';
 import 'package:sea_mates/data/user.dart';
 import 'package:sea_mates/data/user_request.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
+import 'package:sea_mates/model/friend_list_model.dart';
 import 'package:sea_mates/model/shift_list_model.dart';
 import 'package:sea_mates/repository/user_repository.dart';
 
@@ -19,13 +20,15 @@ class UserModel extends ChangeNotifier {
 
   final UserRepository userRepository;
   late ShiftListModel shiftListModel;
+  late FriendListModel friendListModel;
 
   UserModel(this.userRepository) {
     load();
   }
 
-  void update(ShiftListModel shiftListModel) {
+  void update(ShiftListModel shiftListModel, FriendListModel friendListModel) {
     this.shiftListModel = shiftListModel;
+    this.friendListModel = friendListModel;
   }
 
   bool _loaded = false;
@@ -264,6 +267,7 @@ class UserModel extends ChangeNotifier {
   Future<void> logout() async {
     await shiftListModel.clearLocalDatabase();
     await userRepository.dropUser();
+    await friendListModel.clearState();
     _userStatus = UserStatus.ANONYMOUS;
     _user = null;
     notifyListeners();

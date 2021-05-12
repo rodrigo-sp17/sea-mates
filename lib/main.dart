@@ -35,9 +35,9 @@ void main() async {
   var userModel = UserModel(UserHiveRepository());
   var shiftListModel = ShiftListModel(ShiftWebClient(), ShiftHiveRepository());
   shiftListModel.update(userModel);
-  userModel.update(shiftListModel);
   var friendListModel = FriendListModel(FriendsWebClient());
   friendListModel.update(userModel);
+  userModel.update(shiftListModel, friendListModel);
 
   runApp(MyApp(userModel, shiftListModel, friendListModel));
 }

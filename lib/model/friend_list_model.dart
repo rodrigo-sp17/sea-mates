@@ -163,4 +163,10 @@ class FriendListModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> clearState() async {
+    _friends = [];
+    _myRequests = [];
+    _otherRequests = [];
+  }
 }
