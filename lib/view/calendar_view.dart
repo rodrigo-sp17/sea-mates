@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/shift.dart';
 import 'package:sea_mates/model/shift_list_model.dart';
+import 'package:sea_mates/view/day_view.dart';
 import 'package:sea_mates/view/shift_add_view.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -14,15 +15,15 @@ class CalendarView extends StatefulWidget {
 
 class _CalendarState extends State<CalendarView> {
   final unavailabilityStartDates =
-      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: getHashCode);
+      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: _getHashCode);
   final unavailabilityEndDates =
-      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: getHashCode);
+      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: _getHashCode);
   final boardingDates =
-      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: getHashCode);
+      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: _getHashCode);
   final leavingDates =
-      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: getHashCode);
+      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: _getHashCode);
   final unavailableDates =
-      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: getHashCode);
+      new LinkedHashSet<DateTime>(equals: isSameDay, hashCode: _getHashCode);
 
   final unStartColor = Colors.amber;
   final boardingColor = Colors.red;
@@ -69,6 +70,11 @@ class _CalendarState extends State<CalendarView> {
                           return SliverList(
                               delegate: SliverChildListDelegate.fixed([
                             TableCalendar(
+                                onDaySelected: (selected, focused) {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      fullscreenDialog: true,
+                                      builder: (context) => DayView(selected)));
+                                },
                                 headerStyle: HeaderStyle(
                                   formatButtonVisible: false,
                                 ),
@@ -179,7 +185,7 @@ class SubtitleTable extends StatelessWidget {
   }
 }
 
-int getHashCode(DateTime key) {
+int _getHashCode(DateTime key) {
   int result = 17;
   result = 31 * result + key.day;
   result = 31 * result + key.month;

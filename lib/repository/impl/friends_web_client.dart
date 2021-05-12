@@ -69,6 +69,37 @@ class FriendsWebClient {
     }
   }
 
+  Future<List<Friend>> getAvailableFriends(
+      String token, DateTime dateTime) async {
+    var response = await http
+        .get(
+            Uri.https(_base, '/api/calendar/available',
+                {"date": dateTime.toIso8601String().substring(0, 10)}),
+            headers: {"authorization": token})
+        .timeout(_timeout)
+        .catchError((e) {
+          log.warning(e);
+          throw e;
+        });
+
+    switch (response.statusCode) {
+      case 200:
+        dynamic decodedJson = jsonDecode(response.body);
+        return _parseFriendsJson(decodedJson);
+      case 302:
+        throw RedirectionException(response.headers.values.toString());
+      case 403:
+        throw ForbiddenException('');
+      case 500:
+        log.severe('${response.headers}\n ${response.body}');
+        throw ServerException('500');
+      default:
+        log.warning(
+            '${response.statusCode}: ${response.headers}\n ${response.body}');
+        throw ServerException('Unexpected response');
+    }
+  }
+
   Future<FriendRequest> requestFriendship(String token, String username) async {
     var response = await http.post(
         Uri.https(_base, _path + '/request', {"username": username}),

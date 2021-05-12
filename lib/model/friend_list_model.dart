@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
@@ -28,13 +29,13 @@ class FriendListModel extends ChangeNotifier {
   List<FriendRequest> _otherRequests = [];
 
   bool get isLoading => _isLoading;
+  UnmodifiableListView<Friend> get friends => UnmodifiableListView(_friends);
+  UnmodifiableListView<FriendRequest> get myRequests =>
+      UnmodifiableListView(_myRequests);
+  UnmodifiableListView<FriendRequest> get otherRequests =>
+      UnmodifiableListView(_otherRequests);
 
-  List<Friend> get friends => _friends;
-
-  List<FriendRequest> get myRequests => _myRequests;
-
-  List<FriendRequest> get otherRequests => _otherRequests;
-
+  // Actions
   Future<String?> refresh() async {
     _isLoading = true;
     notifyListeners();
@@ -67,6 +68,29 @@ class FriendListModel extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  /// Fetches available friends on the provided date
+  /// Returns null if not available or an Future error if some error occurred
+  Future<List<Friend>?> fetchAvailableFriends(DateTime date) async {
+    if (!_userModel.hasAuthentication()) {
+      return null;
+    }
+
+    try {
+      var friends = await _friendsWebClient.getAvailableFriends(
+          _userModel.getToken(), date);
+      return friends;
+    } on TimeoutException {
+      return Future.error('Could not reach server. Are you online?');
+    } on ForbiddenException {
+      // TODO - handle
+      return Future.error('You are not unauthorized');
+    } on ServerException {
+      return Future.error("Sync failed!");
+    } on Exception {
+      return Future.error("Something went wrong...");
     }
   }
 
