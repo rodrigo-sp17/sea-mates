@@ -48,23 +48,6 @@ class ShiftWebClient implements ShiftRemoteRepository {
             '${response.statusCode}: ${response.headers}\n ${response.body}');
         throw UnexpectedResponseException(response.statusCode.toString());
     }
-
-/*        if (response.statusCode == 200) {
-          dynamic decodedJson = jsonDecode(response.body);
-          Iterable<dynamic> resultList = decodedJson['_embedded']['shiftList'];
-          resultList.forEach((element) {
-            var shift = Shift.fromJson(element);
-            shift.syncStatus = SyncStatus.SYNC;
-            result.add(shift);
-          });
-        } else if (response.statusCode == 400) {
-          Map<String, String> errors = jsonDecode(response.body);
-          throw BadRequestException(errors.toString());
-        } else if (response.statusCode == 403 || response.statusCode == 401) {
-          throw ForbiddenException(response.body);
-        } else {
-          throw ServerException(response.toString());
-        }*/
   }
 
   @override
@@ -91,30 +74,6 @@ class ShiftWebClient implements ShiftRemoteRepository {
             '${response.statusCode}: ${response.headers}\n ${response.body}');
         throw UnexpectedResponseException(response.statusCode.toString());
     }
-
-/*    if (response.statusCode == 200) {
-      dynamic decodedJson = jsonDecode(response.body);
-      print(decodedJson);
-      if (decodedJson.isEmpty) {
-        return <Shift>[];
-      } else {
-        Iterable<dynamic> resultList = decodedJson['_embedded']['shiftList'];
-        resultList.forEach((element) {
-          print(element);
-          var shift = Shift.fromJson(element);
-          shift.syncStatus = SyncStatus.SYNC;
-          result.add(shift);
-        });
-      }
-    } else if (response.statusCode == 400) {
-      Map<String, String> errors = jsonDecode(response.body);
-      throw BadRequestException(errors.toString());
-    } else if (response.statusCode == 403 || response.statusCode == 401) {
-      throw ForbiddenException(response.body);
-    } else {
-      throw ServerException(response.toString());
-    }
-    return result;*/
   }
 
   @override
@@ -145,57 +104,6 @@ class ShiftWebClient implements ShiftRemoteRepository {
             '${response.statusCode}: ${response.headers}\n ${response.body}');
         throw UnexpectedResponseException(response.statusCode.toString());
     }
-
-/*    var client = http.Client();
-    try {
-      for (int id in shiftIds) {
-        var response = await client
-            .delete(Uri.https(_base, _path + '/remove', {'id': id.toString()}),
-                headers: {'Authorization': token})
-            .timeout(_timeout)
-            .catchError((e) {
-              _log.warning(e);
-              throw e;
-            });
-
-        switch (response.statusCode) {
-          case 204:
-            counter++;
-            break;
-          case 400:
-            throw BadRequestException('');
-          case 404:
-            throw NotFoundException('');
-          case 403:
-            throw ForbiddenException('');
-          case 500:
-            _log.severe('${response.headers}\n ${response.body}');
-            throw ServerException('500');
-          default:
-            _log.warning(
-                '${response.statusCode}: ${response.headers}\n ${response.body}');
-            throw UnexpectedResponseException(response.statusCode.toString());
-        }
-*/ /*        if (response.statusCode == 204) {
-          counter++;
-        } else if (response.statusCode == 400) {
-          Map<String, String> errors = jsonDecode(response.body);
-          throw BadRequestException(errors.toString());
-        } else if (response.statusCode == 403 || response.statusCode == 401) {
-          throw ForbiddenException(response.body);
-        } else {
-          print(response.request!.headers.toString());
-          print(response.statusCode);
-          print(response.reasonPhrase);
-          print(response.headers.toString());
-          print(response.body);
-          throw ServerException(response.toString());
-        }*/ /*
-      }
-    } finally {
-      client.close();
-    }
-    return counter;*/
   }
 
   @override
