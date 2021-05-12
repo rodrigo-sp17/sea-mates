@@ -18,6 +18,7 @@ import 'package:sea_mates/repository/user_repository.dart';
 class UserModel extends ChangeNotifier {
   final log = Logger('UserModel');
 
+  // Dependencies
   final UserRepository userRepository;
   late ShiftListModel shiftListModel;
   late FriendListModel friendListModel;
@@ -31,6 +32,7 @@ class UserModel extends ChangeNotifier {
     this.friendListModel = friendListModel;
   }
 
+  // State
   bool _loaded = false;
   User? _user;
   UserStatus _userStatus = UserStatus.ANONYMOUS;
@@ -50,6 +52,12 @@ class UserModel extends ChangeNotifier {
     }
     _loaded = true;
     notifyListeners();
+  }
+
+  /// Triggers the loading/refresh of dependencies that depend on user status
+  void refreshOnlineData() {
+    shiftListModel.syncShifts();
+    friendListModel.refresh();
   }
 
   bool hasAuthentication() {
@@ -204,6 +212,7 @@ class UserModel extends ChangeNotifier {
 
     var hasUserInfo = await _fetchUserInfo(token);
     if (hasUserInfo) {
+      refreshOnlineData();
       return true;
     } else {
       return false;
@@ -236,6 +245,7 @@ class UserModel extends ChangeNotifier {
       var hasUserInfo = await _fetchUserInfo(token!);
       if (hasUserInfo) {
         answer = true;
+        refreshOnlineData();
       } else {
         error = "Failed to fetch user info";
       }
