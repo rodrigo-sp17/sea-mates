@@ -2,18 +2,21 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:sea_mates/data/shift.dart';
 import 'package:sea_mates/data/sync_status.dart';
+import 'package:sea_mates/exception/rest_exceptions.dart';
 import 'package:sea_mates/model/user_model.dart';
 import 'package:sea_mates/repository/shift_local_repository.dart';
 import 'package:sea_mates/repository/shift_remote_repository.dart';
 
 class ShiftListModel extends ChangeNotifier {
+  final _log = Logger('ShiftListModel');
+
+  // Dependencies
   final ShiftRemoteRepository _shiftRemoteRepository;
   final ShiftLocalRepository _shiftLocalRepository;
   late UserModel _userModel;
-
-  List<Shift> _shifts;
 
   ShiftListModel(this._shiftRemoteRepository, this._shiftLocalRepository,
       {List<Shift>? shifts})
@@ -24,43 +27,86 @@ class ShiftListModel extends ChangeNotifier {
     return this;
   }
 
-  Future<UnmodifiableListView<Shift>> get shifts async =>
-      UnmodifiableListView(_shifts);
+  // State
+  bool _isLoading = false;
+  List<Shift> _shifts;
+  Set<int> _selectedIds = {};
 
-  /// Syncs shifts
-  /// To be called at app initialization and upon user request
-  Future syncShifts() async {
+  bool get isLoading => _isLoading;
+  UnmodifiableListView<Shift> get shifts => UnmodifiableListView(_shifts);
+  UnmodifiableSetView<int> get selectedIds => UnmodifiableSetView(_selectedIds);
+
+  /// Syncs shifts with remote repository
+  Future<String?> syncShifts() async {
+    // Sync strategy:
+    // - Load both local and remote datasets
+    // - Remove SYNCED local data
+    // - Add remote data to local data
+    // - Add all UN-SYNCED data
+    // - Save all UN-SYNCED data to local
+
     if (!_userModel.hasAuthentication()) {
-      return Future.error(
-          "Synchronization is only possible when authenticated");
+      return "Sync is unavailable in local mode";
     }
+
+    _isLoading = true;
+    notifyListeners();
+
     var token = _userModel.getToken();
 
-    var localShifts = await _shiftLocalRepository.loadLocal();
-    var remoteShifts = await _shiftRemoteRepository.loadRemote(token);
+    String? errorMessage;
+    var localShifts = <Shift>[];
+    var remoteShifts = <Shift>[];
+    try {
+      localShifts = await _shiftLocalRepository.loadLocal();
+      remoteShifts = await _shiftRemoteRepository.loadRemote(token);
+    } on ForbiddenException {
+      errorMessage = 'Sync forbidden - please log in again';
+    } on RestException {
+      errorMessage = "Failed to fetch data";
+    }
 
-    var unsyncedShifts = <Shift>[];
-    localShifts.forEach((shift) {
-      if (shift.syncStatus == SyncStatus.UNSYNC) {
-        unsyncedShifts.add(shift);
-      }
-    });
+    if (errorMessage != null) {
+      _isLoading = false;
+      notifyListeners();
+      return errorMessage;
+    }
+
+    var unSyncShifts = localShifts
+        .takeWhile((shift) => shift.syncStatus == SyncStatus.UNSYNC)
+        .toList();
 
     // Replaces local data for remote data
-    await _shiftLocalRepository.removeLocal(localShifts.map((s) => s.id!));
-    await _shiftLocalRepository.saveLocal(remoteShifts);
+    try {
+      await _shiftLocalRepository.removeLocal(localShifts.map((s) => s.id!));
+      await _shiftLocalRepository.saveLocal(remoteShifts);
+    } on Exception {
+      _isLoading = false;
+      notifyListeners();
+      return 'Failed to sync locally';
+    }
 
     // Adds pending shifts to the server
-    List<Shift> added = await _shiftRemoteRepository
-        .addRemote(unsyncedShifts, token)
-        .catchError((e) {
-      // avoids losing the unsynced ones
-      _shiftLocalRepository.addLocal(unsyncedShifts);
-      throw e;
-    });
+    var added = <Shift>[];
+    var remaining = <Shift>[];
+    for (Shift s in unSyncShifts) {
+      try {
+        var addedShifts = await _shiftRemoteRepository.addRemote(s, token);
+        added.addAll(addedShifts);
+      } on Exception {
+        remaining.add(s);
+      }
+    }
+    if (added.isNotEmpty) {
+      await _shiftLocalRepository.saveLocal(added);
+    }
+    if (remaining.isNotEmpty) {
+      await _shiftLocalRepository.addLocal(remaining);
+    }
 
-    await _shiftLocalRepository.saveLocal(added);
     _shifts = await _shiftLocalRepository.loadLocal();
+
+    _isLoading = false;
     notifyListeners();
   }
 
@@ -75,32 +121,69 @@ class ShiftListModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void selectId(int shiftId) {
+    _selectedIds.add(shiftId);
+    notifyListeners();
+  }
+
+  void unselectId(int shiftId) {
+    _selectedIds.remove(shiftId);
+    notifyListeners();
+  }
+
+  void resetSelection() {
+    _selectedIds = {};
+    notifyListeners();
+  }
+
   /// Removes a shift
   /// Attempts remote deletions as soon as possible
-  Future<void> remove(Set<int> indexes) async {
-    var token = _userModel.getToken();
-    List<int> synced = [], unsynced = [];
-    indexes.forEach((index) {
-      var shift = _shifts.elementAt(index);
-      int id = shift.id!;
-      shift.syncStatus == SyncStatus.SYNC ? synced.add(id) : unsynced.add(id);
+  Future<String?> removeSelected() async {
+    List<int> synced = [], unSynced = [];
+    _shifts.forEach((shift) {
+      var id = shift.id!;
+      if (_selectedIds.contains(id)) {
+        shift.syncStatus == SyncStatus.SYNC ? synced.add(id) : unSynced.add(id);
+      }
     });
 
     // for un-synced
-    if (unsynced.isNotEmpty) {
-      await _shiftLocalRepository.removeLocal(unsynced);
+    if (unSynced.isNotEmpty) {
+      await _shiftLocalRepository.removeLocal(unSynced);
       _shifts = await _shiftLocalRepository.loadLocal();
+      _selectedIds.removeAll(unSynced);
       notifyListeners();
     }
 
     // for synced - requires online access
-    if (synced.isNotEmpty && _userModel.hasAuthentication()) {
-      await _shiftRemoteRepository.removeRemote(synced, token).catchError((e) {
-        throw Exception('Deletion failed! :(');
-      });
-      await _shiftLocalRepository.removeLocal(synced);
-      _shifts = await _shiftLocalRepository.loadLocal();
+    if (synced.isNotEmpty) {
+      if (!_userModel.hasAuthentication()) {
+        return 'Synced shifts cannot be deleted when in local mode';
+      }
+
+      var token = _userModel.getToken();
+      _isLoading = true;
       notifyListeners();
+
+      String? errorMsg;
+      var removed = <int>[];
+      for (int id in synced) {
+        try {
+          var success = await _shiftRemoteRepository.removeRemote(id, token);
+          if (success) removed.add(id);
+        } on Exception {
+          errorMsg = "Some items could not be deleted";
+        }
+      }
+
+      _selectedIds.removeAll(removed);
+      await _shiftLocalRepository.removeLocal(removed);
+      _shifts = await _shiftLocalRepository.loadLocal();
+
+      _isLoading = false;
+      notifyListeners();
+
+      return errorMsg;
     }
   }
 

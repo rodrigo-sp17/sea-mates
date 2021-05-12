@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:logging/logging.dart';
 import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/data/shift.dart';
 import 'package:sea_mates/data/sync_status.dart';
@@ -9,23 +10,46 @@ import 'package:sea_mates/exception/rest_exceptions.dart';
 import '../shift_remote_repository.dart';
 
 class ShiftWebClient implements ShiftRemoteRepository {
-  final String base = ApiUtils.API_BASE;
-  final String path = '/api/shift';
+  static const String _base = ApiUtils.API_BASE;
+  static const String _path = '/api/shift';
+  static const _timeout = Duration(seconds: 15);
+
+  final _log = Logger("ShiftWebClient");
 
   @override
-  Future<List<Shift>> addRemote(Iterable<Shift> shifts, String token) async {
-    List<Shift> result = [];
-    var client = http.Client();
-    try {
-      for (Shift s in shifts) {
-        var response = await client.post(Uri.https(base, path + '/add'),
-            body: json.encode(s.toJson()),
+  Future<List<Shift>> addRemote(Shift shift, String token) async {
+    var response = await http
+        .post(Uri.https(_base, _path + '/add'),
+            body: json.encode(shift.toJson()),
             headers: {
               'content-type': 'application/json',
               'Authorization': token
-            });
+            })
+        .timeout(_timeout)
+        .catchError((e) {
+          _log.warning(e);
+          throw e;
+        });
 
-        if (response.statusCode == 200) {
+    switch (response.statusCode) {
+      case 200:
+        dynamic decodedJson = jsonDecode(response.body);
+        return _parseShiftListJson(decodedJson);
+      case 400:
+        Map<String, String> errors = jsonDecode(response.body);
+        throw BadRequestException(errors.toString());
+      case 403:
+        throw ForbiddenException('');
+      case 500:
+        _log.severe('${response.headers}\n ${response.body}');
+        throw ServerException('500');
+      default:
+        _log.warning(
+            '${response.statusCode}: ${response.headers}\n ${response.body}');
+        throw UnexpectedResponseException(response.statusCode.toString());
+    }
+
+/*        if (response.statusCode == 200) {
           dynamic decodedJson = jsonDecode(response.body);
           Iterable<dynamic> resultList = decodedJson['_embedded']['shiftList'];
           resultList.forEach((element) {
@@ -40,21 +64,35 @@ class ShiftWebClient implements ShiftRemoteRepository {
           throw ForbiddenException(response.body);
         } else {
           throw ServerException(response.toString());
-        }
-      }
-    } finally {
-      client.close();
-    }
-    return result;
+        }*/
   }
 
   @override
   Future<List<Shift>> loadRemote(String token) async {
-    List<Shift> result = [];
     var response = await http
-        .get(Uri.https(base, path), headers: {'Authorization': token});
+        .get(Uri.https(_base, _path), headers: {'Authorization': token})
+        .timeout(_timeout)
+        .catchError((e) {
+          _log.warning(e);
+          throw e;
+        });
 
-    if (response.statusCode == 200) {
+    switch (response.statusCode) {
+      case 200:
+        dynamic decodedJson = jsonDecode(response.body);
+        return _parseShiftListJson(decodedJson);
+      case 403:
+        throw ForbiddenException('');
+      case 500:
+        _log.severe('${response.headers}\n ${response.body}');
+        throw ServerException('500');
+      default:
+        _log.warning(
+            '${response.statusCode}: ${response.headers}\n ${response.body}');
+        throw UnexpectedResponseException(response.statusCode.toString());
+    }
+
+/*    if (response.statusCode == 200) {
       dynamic decodedJson = jsonDecode(response.body);
       print(decodedJson);
       if (decodedJson.isEmpty) {
@@ -76,20 +114,69 @@ class ShiftWebClient implements ShiftRemoteRepository {
     } else {
       throw ServerException(response.toString());
     }
-    return result;
+    return result;*/
   }
 
   @override
-  Future<int> removeRemote(Iterable<int> shiftIds, String token) async {
-    int counter = 0;
-    var client = http.Client();
+  Future<bool> removeRemote(int shiftId, String token) async {
+    var response = await http
+        .delete(Uri.https(_base, _path + '/remove', {'id': shiftId.toString()}),
+            headers: {'Authorization': token})
+        .timeout(_timeout)
+        .catchError((e) {
+          _log.warning(e);
+          throw e;
+        });
+
+    switch (response.statusCode) {
+      case 204:
+        return true;
+      case 400:
+        throw BadRequestException('');
+      case 404:
+        throw NotFoundException('');
+      case 403:
+        throw ForbiddenException('');
+      case 500:
+        _log.severe('${response.headers}\n ${response.body}');
+        throw ServerException('500');
+      default:
+        _log.warning(
+            '${response.statusCode}: ${response.headers}\n ${response.body}');
+        throw UnexpectedResponseException(response.statusCode.toString());
+    }
+
+/*    var client = http.Client();
     try {
       for (int id in shiftIds) {
-        var response = await client.delete(
-            Uri.https(base, path + '/remove', {'id': id.toString()}),
-            headers: {'Authorization': token});
+        var response = await client
+            .delete(Uri.https(_base, _path + '/remove', {'id': id.toString()}),
+                headers: {'Authorization': token})
+            .timeout(_timeout)
+            .catchError((e) {
+              _log.warning(e);
+              throw e;
+            });
 
-        if (response.statusCode == 204) {
+        switch (response.statusCode) {
+          case 204:
+            counter++;
+            break;
+          case 400:
+            throw BadRequestException('');
+          case 404:
+            throw NotFoundException('');
+          case 403:
+            throw ForbiddenException('');
+          case 500:
+            _log.severe('${response.headers}\n ${response.body}');
+            throw ServerException('500');
+          default:
+            _log.warning(
+                '${response.statusCode}: ${response.headers}\n ${response.body}');
+            throw UnexpectedResponseException(response.statusCode.toString());
+        }
+*/ /*        if (response.statusCode == 204) {
           counter++;
         } else if (response.statusCode == 400) {
           Map<String, String> errors = jsonDecode(response.body);
@@ -103,12 +190,12 @@ class ShiftWebClient implements ShiftRemoteRepository {
           print(response.headers.toString());
           print(response.body);
           throw ServerException(response.toString());
-        }
+        }*/ /*
       }
     } finally {
       client.close();
     }
-    return counter;
+    return counter;*/
   }
 
   @override
@@ -117,29 +204,63 @@ class ShiftWebClient implements ShiftRemoteRepository {
     var client = http.Client();
     try {
       for (Shift s in shifts) {
-        var response = await client.put(Uri.https(base, path + '/edit'),
-            body: json.encode(s.toJson()),
-            headers: {
-              'content-type': 'application/json',
-              'Authorization': token
+        var response = await client
+            .put(Uri.https(_base, _path + '/edit'),
+                body: json.encode(s.toJson()),
+                headers: {
+                  'content-type': 'application/json',
+                  'Authorization': token
+                })
+            .timeout(_timeout)
+            .catchError((e) {
+              _log.warning(e);
+              throw e;
             });
-        if (response.statusCode == 200) {
-          List<dynamic> resultList = jsonDecode(response.body);
-          resultList.forEach((element) {
-            result.add(Shift.fromJson(element));
-          });
-        } else if (response.statusCode == 400) {
-          Map<String, String> errors = jsonDecode(response.body);
-          throw BadRequestException(errors.toString());
-        } else if (response.statusCode == 403 || response.statusCode == 401) {
-          throw ForbiddenException(response.body);
-        } else {
-          throw ServerException(response.toString());
+
+        switch (response.statusCode) {
+          case 200:
+            dynamic decodedJson = jsonDecode(response.body);
+            var shift = Shift.fromJson(decodedJson);
+            shift.syncStatus = SyncStatus.SYNC;
+            result.add(shift);
+            break;
+          case 400:
+            Map<String, String> errors = jsonDecode(response.body);
+            throw BadRequestException(errors.toString());
+          case 401:
+            throw ForbiddenException('Unauthorized');
+          case 403:
+            throw ForbiddenException('Unauthorized');
+          case 404:
+            throw NotFoundException('');
+          case 500:
+            _log.severe('${response.headers}\n ${response.body}');
+            throw ServerException('500');
+          default:
+            _log.warning(
+                '${response.statusCode}: ${response.headers}\n ${response.body}');
+            throw UnexpectedResponseException(response.statusCode.toString());
         }
       }
     } finally {
       client.close();
     }
     return result;
+  }
+
+  List<Shift> _parseShiftListJson(dynamic decodedJson) {
+    List<Shift> result = [];
+    Iterable<dynamic>? resultList = decodedJson['_embedded']?['shiftList'];
+    if (resultList == null || resultList.isEmpty) {
+      return result;
+    } else {
+      resultList.forEach((element) {
+        var shift = Shift.fromJson(element);
+        shift.syncStatus = SyncStatus.SYNC;
+        result.add(shift);
+      });
+
+      return result;
+    }
   }
 }

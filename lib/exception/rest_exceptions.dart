@@ -36,3 +36,9 @@ class ForbiddenException extends RestException {
 
   ForbiddenException(this.message);
 }
+
+class UnexpectedResponseException extends RestException {
+  String message;
+
+  UnexpectedResponseException(this.message);
+}

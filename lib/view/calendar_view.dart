@@ -61,71 +61,57 @@ class _CalendarState extends State<CalendarView> {
             ),
             Consumer<ShiftListModel>(
                 builder: (context, model, child) {
-                  return FutureBuilder(
-                      future: model.shifts,
-                      builder: (context, AsyncSnapshot<List<Shift>> snapshot) {
-                        if (snapshot.hasData) {
-                          var shifts = snapshot.data!;
-                          _parseShifts(shifts);
-                          return SliverList(
-                              delegate: SliverChildListDelegate.fixed([
-                            TableCalendar(
-                                onDaySelected: (selected, focused) {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      fullscreenDialog: true,
-                                      builder: (context) => DayView(selected)));
-                                },
-                                headerStyle: HeaderStyle(
-                                  formatButtonVisible: false,
-                                ),
-                                calendarBuilders: CalendarBuilders(
-                                  prioritizedBuilder:
-                                      (context, DateTime day, focusedDay) {
-                                    Color? color;
-                                    if (boardingDates.contains(day)) {
-                                      color = boardingColor;
-                                    } else if (unavailabilityStartDates
-                                        .contains(day)) {
-                                      color = unStartColor;
-                                    } else if (unavailableDates.contains(day)) {
-                                      color = unavailableColor;
-                                    } else if (leavingDates.contains(day)) {
-                                      color = leavingColor;
-                                    } else if (unavailabilityEndDates
-                                        .contains(day)) {
-                                      color = unEndColor;
-                                    }
-                                    return color == null
-                                        ? null
-                                        : Container(
-                                            alignment: Alignment.center,
-                                            decoration:
-                                                BoxDecoration(color: color),
-                                            child: Text(day.day.toString()),
-                                          );
-                                  },
-                                ),
-                                focusedDay: DateTime.now(),
-                                firstDay: DateTime.now()
-                                    .subtract(Duration(days: 2000)),
-                                lastDay:
-                                    DateTime.now().add(Duration(days: 2000))),
-                            child!
-                          ]));
-                        } else if (snapshot.hasError) {
-                          return SliverFillRemaining(
-                            child: Center(
-                              child: Text(
-                                  "Oops...error loading shifts! Will handle soon!"),
-                            ),
-                          );
-                        } else {
-                          return SliverFillRemaining(
-                              child: Center(
-                            child: CircularProgressIndicator(),
-                          ));
-                        }
-                      });
+                  if (model.isLoading) {
+                    return SliverFillRemaining(
+                        child: Center(
+                      child: CircularProgressIndicator(),
+                    ));
+                  } else {
+                    var shifts = model.shifts;
+                    _parseShifts(shifts);
+                    return SliverList(
+                        delegate: SliverChildListDelegate.fixed([
+                      TableCalendar(
+                          onDaySelected: (selected, focused) {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                fullscreenDialog: true,
+                                builder: (context) => DayView(selected)));
+                          },
+                          headerStyle: HeaderStyle(
+                            formatButtonVisible: false,
+                          ),
+                          calendarBuilders: CalendarBuilders(
+                            prioritizedBuilder:
+                                (context, DateTime day, focusedDay) {
+                              Color? color;
+                              if (boardingDates.contains(day)) {
+                                color = boardingColor;
+                              } else if (unavailabilityStartDates
+                                  .contains(day)) {
+                                color = unStartColor;
+                              } else if (unavailableDates.contains(day)) {
+                                color = unavailableColor;
+                              } else if (leavingDates.contains(day)) {
+                                color = leavingColor;
+                              } else if (unavailabilityEndDates.contains(day)) {
+                                color = unEndColor;
+                              }
+                              return color == null
+                                  ? null
+                                  : Container(
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(color: color),
+                                      child: Text(day.day.toString()),
+                                    );
+                            },
+                          ),
+                          focusedDay: DateTime.now(),
+                          firstDay:
+                              DateTime.now().subtract(Duration(days: 2000)),
+                          lastDay: DateTime.now().add(Duration(days: 2000))),
+                      child!
+                    ]));
+                  }
                 },
                 child: SubtitleTable(<Color, String>{
                   unStartColor: 'Start of unavailability',
