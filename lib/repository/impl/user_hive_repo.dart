@@ -7,7 +7,7 @@ import 'package:sea_mates/repository/user_repository.dart';
 class UserHiveRepository implements UserRepository {
   final String _boxName = "userBox";
   final int _key = 17; // just a random key number
-  final String localId = "LOCAL_USER";
+  final String _localId = "LOCAL_USER";
 
   @override
   Future<User> loadUser() async {
@@ -16,7 +16,7 @@ class UserHiveRepository implements UserRepository {
     if (result == null) {
       throw UserNotFoundException("No user");
     }
-    if (result == localId) {
+    if (result == _localId) {
       return LocalUser();
     } else {
       return result as AuthenticatedUser;
@@ -27,7 +27,7 @@ class UserHiveRepository implements UserRepository {
   Future<void> saveUser(User user) async {
     var box = await Hive.openBox(_boxName);
     if (user.isLocalUser()) {
-      await box.put(_key, localId);
+      await box.put(_key, _localId);
     } else {
       await box.put(_key, user);
     }

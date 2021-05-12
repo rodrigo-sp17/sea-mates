@@ -21,13 +21,14 @@ class AuthenticatedUserAdapter extends TypeAdapter<AuthenticatedUser> {
       username: fields[1] as String,
       name: fields[2] as String,
       email: fields[3] as String,
+      token: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, AuthenticatedUser obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class AuthenticatedUserAdapter extends TypeAdapter<AuthenticatedUser> {
       ..writeByte(2)
       ..write(obj.name)
       ..writeByte(3)
-      ..write(obj.email);
+      ..write(obj.email)
+      ..writeByte(4)
+      ..write(obj.token);
   }
 
   @override

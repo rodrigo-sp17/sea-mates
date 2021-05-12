@@ -20,6 +20,7 @@ class AuthenticatedUser implements User {
   @HiveField(3)
   String email;
 
+  @HiveField(4)
   @JsonKey(ignore: true)
   String token;
 
