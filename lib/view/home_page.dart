@@ -152,8 +152,8 @@ class _HomePageState extends State<HomePage> {
           length: children.length,
           child: Scaffold(
             bottomNavigationBar: TabBar(
-                labelColor: Colors.blue,
-                indicatorColor: Colors.blue,
+                labelColor: Theme.of(context).primaryColorLight,
+                indicatorColor: Theme.of(context).primaryColorLight,
                 tabs: tabs),
             body: TabBarView(
               children: children,

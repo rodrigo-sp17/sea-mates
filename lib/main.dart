@@ -73,9 +73,19 @@ class MyApp extends StatelessWidget {
             navigatorKey: userModel.navigatorKey,
             title: 'Flutter Demo',
             theme: ThemeData(
-                primarySwatch: Colors.indigo,
+                primaryColor: Color(0xff064273),
+                primaryColorLight: Color(0xff456da2),
+                primaryColorDark: Color(0xff001c47),
+                accentColor: Color(0xff76b6c4),
+                secondaryHeaderColor: Color(0xff458694),
+                primaryTextTheme:
+                    TextTheme(bodyText2: TextStyle(color: Color(0xffffffff))),
+                accentTextTheme:
+                    TextTheme(bodyText2: TextStyle(color: Color(0xff000000))),
                 elevatedButtonTheme: ElevatedButtonThemeData(
                     style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Color(0xff76b6c4)),
                         minimumSize:
                             MaterialStateProperty.all(Size.fromHeight(45)),
                         textStyle: MaterialStateProperty.all(TextStyle(

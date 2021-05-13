@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_signin_button/button_list.dart';
@@ -12,87 +14,106 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-          backgroundColor: Colors.white,
-          body: Scrollbar(
-              child: ListView(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-            children: [
-              SizedBox(
-                height: 220,
-                child: Text('Logo placeholder'),
-              ),
-              ConstrainedBox(
-                constraints: BoxConstraints.tightFor(height: 45),
-                child: SignInButton(Buttons.Facebook,
-                    text: 'Continue with Facebook'.i18n,
-                    onPressed: () => Navigator.pushNamed(context, '/oauth2')),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/login');
-                  },
-                  child: Text("Login with email".i18n)),
-              Divider(
-                height: 20,
-                thickness: 0,
-              ),
-              ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.amber)),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/signup');
-                  },
-                  child: Text("Signup".i18n)),
-              Divider(
-                height: 20,
-                thickness: 0,
-              ),
-              Consumer<UserModel>(builder: (context, model, child) {
-                switch (model.userStatus) {
-                  case UserStatus.ANONYMOUS:
-                    return ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.grey)),
-                        onPressed: () {
-                          _showLocalUserDialog(context);
-                        },
-                        child: Text("Continue offline".i18n));
-                  case UserStatus.LOCAL:
-                    return ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.grey)),
-                        onPressed: () => Navigator.pushNamed(context, '/home'),
-                        child: Text("Remain in local mode".i18n));
-                  case UserStatus.AUTH:
-                    return ElevatedButton(
+        onWillPop: () async => false,
+        child: Scaffold(
+          body: Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                    Theme.of(context).primaryColor,
+                    Theme.of(context).accentColor
+                  ])),
+              child: Scrollbar(
+                  child: ListView(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                children: [
+                  SizedBox(
+                    height: 220,
+                    child: Text('Logo placeholder'),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(height: 45),
+                    child: SignInButton(Buttons.Facebook,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        text: 'Continue with Facebook'.i18n,
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/oauth2')),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/login');
+                      },
+                      child: Text("Login with email".i18n)),
+                  Divider(
+                    height: 20,
+                    thickness: 0,
+                  ),
+                  ElevatedButton(
                       style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.grey)),
-                      onPressed: () => _showLogoutDialog(context),
-                      child: Text("Logout"),
-                    );
-                  default:
-                    throw AssertionError("Unrecognized user status");
-                }
-              }),
-              SizedBox(
-                height: 15,
-              ),
-              TextButton(
-                onPressed: () => launch(
-                    Uri.https(ApiUtils.API_BASE, '/recovery').toString()),
-                child: Text('Forgot your password?'.i18n),
-              )
-            ],
-          ))),
-    );
+                          backgroundColor: MaterialStateProperty.all(
+                              Theme.of(context).primaryColorLight)),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/signup');
+                      },
+                      child: Text("Signup".i18n)),
+                  Divider(
+                    height: 20,
+                    thickness: 0,
+                  ),
+                  Consumer<UserModel>(builder: (context, model, child) {
+                    switch (model.userStatus) {
+                      case UserStatus.ANONYMOUS:
+                        return ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.grey)),
+                            onPressed: () {
+                              _showLocalUserDialog(context);
+                            },
+                            child: Text("Continue offline".i18n));
+                      case UserStatus.LOCAL:
+                        return ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.grey)),
+                            onPressed: () =>
+                                Navigator.pushNamed(context, '/home'),
+                            child: Text("Remain in local mode".i18n));
+                      case UserStatus.AUTH:
+                        return ElevatedButton(
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.grey)),
+                          onPressed: () => _showLogoutDialog(context),
+                          child: Text("Logout"),
+                        );
+                      default:
+                        throw AssertionError("Unrecognized user status");
+                    }
+                  }),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  TextButton(
+                    onPressed: () => launch(
+                        Uri.https(ApiUtils.API_BASE, '/recovery').toString()),
+                    child: Text(
+                      'Forgot your password?'.i18n,
+                      textScaleFactor: 1.1,
+                      style: TextStyle(
+                          color: Colors.white,
+                          decoration: TextDecoration.underline),
+                    ),
+                  )
+                ],
+              ))),
+        ));
   }
 }
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:sea_mates/strings.i18n.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/user_request.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
 import 'package:sea_mates/model/user_model.dart';
+import 'package:sea_mates/strings.i18n.dart';
 import 'package:sea_mates/validators.dart';
 
 class SignupPage extends StatelessWidget {
@@ -175,7 +175,6 @@ class _SignupFormState extends State<SignupForm> {
                         onPressed: _submit,
                         child: Text(
                           'SIGNUP'.i18n,
-                          textScaleFactor: 1.2,
                         ));
                   } else {
                     return Center(child: CircularProgressIndicator());
