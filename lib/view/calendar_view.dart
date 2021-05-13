@@ -131,8 +131,11 @@ class _CalendarState extends State<CalendarView> {
             tooltip: "Shift".i18n,
             child: Icon(Icons.add),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ShiftAddView()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      fullscreenDialog: true,
+                      builder: (context) => ShiftAddView()));
             },
           ),
         )

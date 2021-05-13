@@ -144,8 +144,11 @@ class _ShiftViewState extends State<ShiftView> {
             child: Icon(Icons.add),
             onPressed: () {
               // call shift dialog
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ShiftAddView()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      fullscreenDialog: true,
+                      builder: (context) => ShiftAddView()));
             },
           ),
         )
