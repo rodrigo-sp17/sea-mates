@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/model/user_model.dart';
+import 'package:sea_mates/strings.i18n.dart';
 import 'package:sea_mates/view/calendar_view.dart';
 import 'package:sea_mates/view/profile_view.dart';
 import 'package:sea_mates/view/shift_view.dart';
@@ -17,15 +18,15 @@ class _HomePageState extends State<HomePage> {
   List<Widget> offlineTabs = [
     Tab(
       icon: Icon(Icons.today),
-      text: 'Calendar',
+      text: 'Calendar'.i18n,
     ),
     Tab(
       icon: Icon(Icons.work),
-      text: 'Shifts',
+      text: 'Shifts'.i18n,
     ),
     Tab(
       icon: Icon(Icons.person),
-      text: 'Profile',
+      text: 'Profile'.i18n,
     ),
   ];
 
@@ -41,19 +42,19 @@ class _HomePageState extends State<HomePage> {
           tabs = [
             Tab(
               icon: Icon(Icons.today),
-              text: 'Calendar',
+              text: 'Calendar'.i18n,
             ),
             Tab(
               icon: Icon(Icons.work),
-              text: 'Shifts',
+              text: 'Shifts'.i18n,
             ),
             Tab(
               icon: Icon(Icons.people),
-              text: 'Friends',
+              text: 'Friends'.i18n,
             ),
             Tab(
               icon: Icon(Icons.person),
-              text: 'Profile',
+              text: 'Profile'.i18n,
             )
           ];
         } else {

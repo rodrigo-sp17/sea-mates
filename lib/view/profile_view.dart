@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:sea_mates/data/auth_user.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
 import 'package:sea_mates/model/user_model.dart';
+import 'package:sea_mates/strings.i18n.dart';
 
 import '../validators.dart';
 
@@ -45,7 +46,7 @@ class _ProfileViewState extends State<ProfileView> {
     await showDialog(
         context: context,
         builder: (_) => AlertDialog(
-              title: Text("Enter a new value"),
+              title: Text("Enter a new value".i18n),
               content: Form(
                 key: key,
                 child: TextFormField(
@@ -62,7 +63,7 @@ class _ProfileViewState extends State<ProfileView> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Text("CANCEL"),
+                  child: Text("CANCEL".i18n),
                 ),
                 TextButton(
                     onPressed: () {
@@ -71,7 +72,7 @@ class _ProfileViewState extends State<ProfileView> {
                         form.save();
                       }
                     },
-                    child: Text('SAVE')),
+                    child: Text('SAVE'.i18n)),
               ],
             )).then((value) => result = value);
 
@@ -82,7 +83,7 @@ class _ProfileViewState extends State<ProfileView> {
               style: ButtonStyle(
                   foregroundColor: MaterialStateProperty.all(Colors.white)),
               onPressed: _submitChanges,
-              child: Text("SAVE CHANGES")),
+              child: Text("SAVE CHANGES".i18n)),
         ];
         editing = true;
         ctrl.text = result!;
@@ -99,15 +100,15 @@ class _ProfileViewState extends State<ProfileView> {
         .editUser(_usernameController.text, _emailController.text)
         .then((success) {
       if (!success) {
-        _showErrorDialog(context, 'Ops...', 'Edition failed!');
+        _showErrorDialog(context, 'Ops...', 'Edition failed!'.i18n);
       }
     }).catchError((e) {
       if (e is ConflictException) {
-        _showErrorDialog(context, 'Edition failed',
-            'The email already exists. Please choose another one');
+        _showErrorDialog(context, 'Edition failed'.i18n,
+            'The email already exists. Please choose another one'.i18n);
       } else {
         _showErrorDialog(
-            context, 'Edition failed', 'Unexpected server response');
+            context, 'Edition failed'.i18n, 'Unexpected server response'.i18n);
       }
     });
     Navigator.pop(context);
@@ -127,13 +128,16 @@ class _ProfileViewState extends State<ProfileView> {
           Navigator.pushNamedAndRemoveUntil(
               context, '/welcome', (route) => false);
         } else {
-          _showErrorDialog(context, 'Deletion failed',
-              'Sorry, the deletion was not authorized');
+          _showErrorDialog(context, 'Deletion failed'.i18n,
+              'Sorry, the deletion was not authorized'.i18n);
         }
       }).catchError((e) {
         if (e is RestException) {
-          _showErrorDialog(context, "Deletion failed",
-              'Sorry, deletion could not be performed at this moment. Could you try logging in again?');
+          _showErrorDialog(
+              context,
+              "Deletion failed".i18n,
+              'Sorry, deletion could not be performed at this moment. Could you try logging in again?'
+                  .i18n);
         }
       });
     }
@@ -148,7 +152,7 @@ class _ProfileViewState extends State<ProfileView> {
       slivers: [
         SliverAppBar(
           automaticallyImplyLeading: false,
-          title: Text("Profile Info"),
+          title: Text("Profile Info".i18n),
           actions: actions,
         ),
         SliverPadding(
@@ -168,7 +172,7 @@ class _ProfileViewState extends State<ProfileView> {
               } else if (model.userStatus == UserStatus.LOCAL) {
                 return Center(
                   child: Text(
-                    'Logged as Local User',
+                    'Logged as Local User'.i18n,
                     textScaleFactor: 1.3,
                   ),
                 );
@@ -183,7 +187,7 @@ class _ProfileViewState extends State<ProfileView> {
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       icon: Icon(Icons.person_outline),
-                      labelText: "Username",
+                      labelText: "Username".i18n,
                     ),
                   ),
                   sizedBox,
@@ -194,7 +198,7 @@ class _ProfileViewState extends State<ProfileView> {
                     decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         icon: Icon(Icons.person),
-                        labelText: "Name",
+                        labelText: "Name".i18n,
                         suffixIcon: IconButton(
                           icon: Icon(Icons.edit),
                           onPressed: () {
@@ -211,7 +215,7 @@ class _ProfileViewState extends State<ProfileView> {
                     decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         icon: Icon(Icons.email),
-                        labelText: "Email",
+                        labelText: "Email".i18n,
                         suffixIcon: IconButton(
                           icon: Icon(Icons.edit),
                           onPressed: () {
@@ -260,7 +264,7 @@ class _ProfileViewState extends State<ProfileView> {
                             backgroundColor:
                                 MaterialStateProperty.all(Colors.red)),
                         child: Text(
-                          "DELETE ACCOUNT",
+                          "DELETE ACCOUNT".i18n,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
@@ -272,7 +276,7 @@ class _ProfileViewState extends State<ProfileView> {
                 case UserStatus.LOCAL:
                   return ElevatedButton(
                       onPressed: () => Navigator.pushNamed(context, '/welcome'),
-                      child: Text('UPGRADE ACCOUNT'));
+                      child: Text('UPGRADE ACCOUNT'.i18n));
                 default:
                   return Center();
               }
@@ -306,12 +310,13 @@ void _showLogoutDialog(BuildContext context) {
             title: Text("Logout"),
             content: SingleChildScrollView(
               child: Text('Are you sure you want to logout?\n'
-                  'All your un-synced modifications will be discarded.'),
+                      'All your un-synced modifications will be discarded.'
+                  .i18n),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('CANCEL'),
+                child: Text('CANCEL'.i18n),
               ),
               TextButton(
                   onPressed: () async {
@@ -320,7 +325,7 @@ void _showLogoutDialog(BuildContext context) {
                     Navigator.pushNamedAndRemoveUntil(
                         context, '/welcome', (_) => false);
                   },
-                  child: Text('YES, LOG ME OUT'))
+                  child: Text('YES, LOG ME OUT'.i18n))
             ],
           ));
 }
@@ -332,11 +337,12 @@ Future<String?> _showDeletionDialog(BuildContext context) async {
       context: context,
       builder: (_) => AlertDialog(
             scrollable: true,
-            title: Text("Account deletion"),
+            title: Text("Account deletion".i18n),
             content: Column(
               children: [
                 Text(
-                    'This actions is permanent.\nPlease confirm your password on the field below to allow deletion:'),
+                    'This actions is permanent.\nPlease confirm your password on the field below to allow deletion:'
+                        .i18n),
                 TextFormField(
                   keyboardType: TextInputType.visiblePassword,
                   textInputAction: TextInputAction.done,
@@ -354,11 +360,11 @@ Future<String?> _showDeletionDialog(BuildContext context) async {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('CANCEL'),
+                child: Text('CANCEL'.i18n),
               ),
               TextButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: Text('YES, DELETE MY ACCOUNT'))
+                  child: Text('YES, DELETE MY ACCOUNT'.i18n))
             ],
           ));
   if (value) {

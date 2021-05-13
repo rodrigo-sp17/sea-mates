@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/friend.dart';
 import 'package:sea_mates/model/friend_list_model.dart';
+import 'package:sea_mates/strings.i18n.dart';
 
 class DayView extends StatelessWidget {
   const DayView(this.date);
@@ -12,7 +14,9 @@ class DayView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Day ${DateFormat.yMd().format(date)}'),
+          title: Text('Day %s'
+              .i18n
+              .fill([DateFormat.yMd(I18n.localeStr).format(date)])),
         ),
         body: CustomScrollView(slivers: [
           SliverToBoxAdapter(
@@ -22,7 +26,7 @@ class DayView extends StatelessWidget {
                   height: 10,
                 ),
                 Text(
-                  "Available Friends",
+                  "Available Friends".i18n,
                   style: Theme.of(context).textTheme.headline6,
                 ),
                 Divider(
@@ -42,10 +46,12 @@ class DayView extends StatelessWidget {
                       if (friends == null) {
                         return SliverToBoxAdapter(
                             child: Center(
-                                child: Text('Not available in local mode')));
+                                child:
+                                    Text('Not available in local mode'.i18n)));
                       } else if (friends.isEmpty) {
                         return SliverToBoxAdapter(
-                            child: Center(child: Text('No friends available')));
+                            child: Center(
+                                child: Text('No friends available'.i18n)));
                       } else {
                         return SliverList(
                           delegate:
@@ -66,7 +72,8 @@ class DayView extends StatelessWidget {
                       return SliverToBoxAdapter(
                           child: Center(
                               child: Text(
-                                  'Error loading friends! Please, try again!')));
+                                  'Error loading friends! Please, try again!'
+                                      .i18n)));
                     } else {
                       return SliverFillRemaining(
                           child: Center(

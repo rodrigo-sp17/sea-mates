@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:i18n_extension/i18n_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/shift.dart';
 import 'package:sea_mates/model/shift_list_model.dart';
+import 'package:sea_mates/strings.i18n.dart';
 
 class ShiftAddView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add a shift"),
+        title: Text("Add a shift".i18n),
       ),
       body: ShiftForm(),
     );
@@ -26,6 +28,7 @@ class ShiftForm extends StatefulWidget {
 
 class _ShiftFormState extends State<StatefulWidget> {
   Shift _shift = Shift.empty();
+  final DateFormat dateFormat = DateFormat.yMd(I18n.localeStr);
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late FocusNode _unStartDate,
@@ -90,7 +93,7 @@ class _ShiftFormState extends State<StatefulWidget> {
 
     if (result != null) {
       setState(() {
-        ctrl.text = DateFormat.yMd().format(result);
+        ctrl.text = dateFormat.format(result);
       });
     }
   }
@@ -104,15 +107,15 @@ class _ShiftFormState extends State<StatefulWidget> {
     DateTime? selected = _parseDate(value);
     DateTime? boarding = _parseDate(_boardDateController.text);
     if (selected == null) {
-      return "Invalid date";
+      return "Invalid date".i18n;
     }
 
     if (boarding == null) {
-      return "Please check your boarding date";
+      return "Please check your boarding date".i18n;
     }
 
     if (selected.isAfter(boarding)) {
-      return "Unavailability can't start after boarding date";
+      return "Unavailability can't start after boarding date".i18n;
     }
 
     return null;
@@ -120,21 +123,21 @@ class _ShiftFormState extends State<StatefulWidget> {
 
   String? _validateBoardDate(String? value) {
     if (value == null || value.isEmpty) {
-      return "Boarding date is mandatory";
+      return "Boarding date is mandatory".i18n;
     }
 
     DateTime? selected = _parseDate(value);
     DateTime? leaving = _parseDate(_leaveDateController.text);
     if (selected == null) {
-      return "Invalid date";
+      return "Invalid date".i18n;
     }
 
     if (leaving == null) {
-      return "Please check your leaving date";
+      return "Please check your leaving date".i18n;
     }
 
     if (selected.isAfter(leaving)) {
-      return "You can't board after you leave";
+      return "You can't board after you leave".i18n;
     }
 
     return null;
@@ -142,22 +145,22 @@ class _ShiftFormState extends State<StatefulWidget> {
 
   String? _validateLeaveDate(String? value) {
     if (value == null || value.isEmpty) {
-      return "Leaving date is mandatory if cycle is not fulfilled";
+      return "Leaving date is mandatory if cycle is not fulfilled".i18n;
     }
 
     DateTime? selected = _parseDate(value);
     DateTime? unEnd = _parseDate(_unEndDateController.text);
 
     if (selected == null) {
-      return "Invalid date";
+      return "Invalid date".i18n;
     }
 
     if (unEnd == null) {
-      return "Please check your dates";
+      return "Please check your dates".i18n;
     }
 
     if (selected.isAfter(unEnd)) {
-      return "You can't be available before you leave";
+      return "You can't be available before you leave".i18n;
     }
   }
 
@@ -169,11 +172,11 @@ class _ShiftFormState extends State<StatefulWidget> {
 
     int? days = int.tryParse(value);
     if (days == null) {
-      return "Are you sure you typed numbers?";
+      return "Are you sure you typed numbers?".i18n;
     } else if (days > 1000) {
-      return "Isn't 3 years too much for a shift?";
+      return "Isn't 3 years too much for a shift?".i18n;
     } else if (days < 0) {
-      return "You can't have a negative cycle day";
+      return "You can't have a negative cycle day".i18n;
     }
 
     return null;
@@ -187,9 +190,9 @@ class _ShiftFormState extends State<StatefulWidget> {
 
     int cycles = int.parse(value);
     if (cycles > 10) {
-      return "Sorry, only 10 repeats are allowed for each input";
+      return "Sorry, only 10 repeats are allowed for each input".i18n;
     } else if (cycles < 0) {
-      return "You can't have negative repeats";
+      return "You can't have negative repeats".i18n;
     }
 
     return null;
@@ -246,8 +249,8 @@ class _ShiftFormState extends State<StatefulWidget> {
         DateTime leaving = boarding.add(Duration(days: days));
         DateTime unEnd = leaving;
         setState(() {
-          _leaveDateController.text = DateFormat.yMd().format(leaving);
-          _unEndDateController.text = DateFormat.yMd().format(unEnd);
+          _leaveDateController.text = dateFormat.format(leaving);
+          _unEndDateController.text = dateFormat.format(unEnd);
         });
       }
     }
@@ -287,9 +290,10 @@ class _ShiftFormState extends State<StatefulWidget> {
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.only(bottom: 10),
                     icon: Icon(Icons.calendar_today),
-                    labelText: "Start of unavailability",
+                    labelText: "Start of unavailability".i18n,
                     helperText:
-                        "Pre-boarding meetings, trainings, quarantines, etc..."),
+                        "Pre-boarding meetings, trainings, quarantines, etc..."
+                            .i18n),
                 validator: _validateUnStartDate,
                 onTap: () {
                   _pickDate(_unStartDateController);
@@ -307,8 +311,9 @@ class _ShiftFormState extends State<StatefulWidget> {
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.only(bottom: 10),
                     icon: Icon(Icons.calendar_today),
-                    labelText: "Boarding date",
-                    helperText: "The date you will actually board the vehicle"),
+                    labelText: "Boarding date".i18n,
+                    helperText:
+                        "The date you will actually board the vehicle".i18n),
                 validator: _validateBoardDate,
                 onTap: () {
                   _pickDate(_boardDateController);
@@ -344,9 +349,10 @@ class _ShiftFormState extends State<StatefulWidget> {
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                           contentPadding: EdgeInsets.only(bottom: 10),
-                          labelText: "Days on board",
+                          labelText: "Days on board".i18n,
                           helperText: "These days will be added to your "
-                              "dates"),
+                                  "dates"
+                              .i18n),
                       validator: _validateCycleDays,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       onFieldSubmitted: (_) {
@@ -369,8 +375,9 @@ class _ShiftFormState extends State<StatefulWidget> {
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.only(bottom: 10),
                     icon: Icon(Icons.calendar_today),
-                    labelText: "Leaving date",
-                    helperText: "The date you will actually leave the vehicle"),
+                    labelText: "Leaving date".i18n,
+                    helperText:
+                        "The date you will actually leave the vehicle".i18n),
                 validator: _validateLeaveDate,
                 onTap: () {
                   _pickDate(_leaveDateController);
@@ -389,9 +396,10 @@ class _ShiftFormState extends State<StatefulWidget> {
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.only(bottom: 10),
                     icon: Icon(Icons.calendar_today),
-                    labelText: "End of unavailability",
+                    labelText: "End of unavailability".i18n,
                     helperText:
-                        "The date (exclusive) after leaving in which you will be available for events"),
+                        "The date (exclusive) after leaving in which you will be available for events"
+                            .i18n),
                 onTap: () {
                   _pickDate(_unEndDateController);
                 },
@@ -408,8 +416,8 @@ class _ShiftFormState extends State<StatefulWidget> {
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.only(bottom: 10),
                     icon: Icon(Icons.repeat),
-                    labelText: "Times to repeat",
-                    helperText: "Use 0 or blank to not repeat the shift",
+                    labelText: "Times to repeat".i18n,
+                    helperText: "Use 0 or blank to not repeat the shift".i18n,
                     suffixText: "x"),
                 validator: _validateRepeat,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -422,7 +430,7 @@ class _ShiftFormState extends State<StatefulWidget> {
             ElevatedButton(
                 onPressed: _handleSubmit,
                 child: Text(
-                  'Add shift',
+                  'Add shift'.i18n,
                   textScaleFactor: 1.2,
                 ))
           ],
@@ -435,7 +443,7 @@ class _ShiftFormState extends State<StatefulWidget> {
 DateTime? _parseDate(String? text) {
   if (text == null) return null;
   try {
-    return DateFormat.yMd().parse(text);
+    return DateFormat.yMd(I18n.localeStr).parse(text);
   } on FormatException {
     return null;
   }

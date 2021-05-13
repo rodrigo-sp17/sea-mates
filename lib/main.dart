@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:i18n_extension/i18n_widget.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/auth_user.dart';
@@ -57,6 +59,16 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider.value(value: friendListModel)
         ],
         child: MaterialApp(
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: [
+              const Locale('en', 'US'),
+              const Locale('pt', 'BR'),
+              const Locale('es', ''),
+            ],
             navigatorKey: userModel.navigatorKey,
             title: 'Flutter Demo',
             theme: ThemeData(
@@ -67,7 +79,7 @@ class MyApp extends StatelessWidget {
                             MaterialStateProperty.all(Size.fromHeight(45)),
                         textStyle: MaterialStateProperty.all(TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold))))),
-            home: Consumer<UserModel>(
+            home: I18n(child: Consumer<UserModel>(
               builder: (context, model, child) {
                 if (model.userStatus != UserStatus.ANONYMOUS) {
                   return HomePage();
@@ -75,7 +87,7 @@ class MyApp extends StatelessWidget {
                   return WelcomePage();
                 }
               },
-            ),
+            )),
             routes: {
               '/welcome': (context) => WelcomePage(),
               '/home': (context) => HomePage(),

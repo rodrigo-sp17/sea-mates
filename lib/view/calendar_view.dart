@@ -1,9 +1,11 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/shift.dart';
 import 'package:sea_mates/model/shift_list_model.dart';
+import 'package:sea_mates/strings.i18n.dart';
 import 'package:sea_mates/view/day_view.dart';
 import 'package:sea_mates/view/shift_add_view.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -56,7 +58,7 @@ class _CalendarState extends State<CalendarView> {
           slivers: [
             SliverAppBar(
               automaticallyImplyLeading: false,
-              title: Text('Calendar'),
+              title: Text('Calendar'.i18n),
               pinned: true,
             ),
             Consumer<ShiftListModel>(
@@ -72,6 +74,7 @@ class _CalendarState extends State<CalendarView> {
                     return SliverList(
                         delegate: SliverChildListDelegate.fixed([
                       TableCalendar(
+                          locale: I18n.locale.toLanguageTag(),
                           onDaySelected: (selected, focused) {
                             Navigator.of(context).push(MaterialPageRoute(
                                 fullscreenDialog: true,
@@ -114,10 +117,10 @@ class _CalendarState extends State<CalendarView> {
                   }
                 },
                 child: SubtitleTable(<Color, String>{
-                  unStartColor: 'Start of unavailability',
-                  boardingColor: 'Boarding day',
-                  leavingColor: 'Leaving day',
-                  unEndColor: 'End of unavailability'
+                  unStartColor: 'Start of unavailability'.i18n,
+                  boardingColor: 'Boarding day'.i18n,
+                  leavingColor: 'Leaving day'.i18n,
+                  unEndColor: 'End of unavailability'.i18n
                 })),
           ],
         ),
@@ -125,7 +128,7 @@ class _CalendarState extends State<CalendarView> {
           bottom: 20,
           right: 20,
           child: FloatingActionButton(
-            tooltip: "Shift",
+            tooltip: "Shift".i18n,
             child: Icon(Icons.add),
             onPressed: () {
               Navigator.push(context,

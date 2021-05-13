@@ -1,9 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/friend.dart';
 import 'package:sea_mates/model/friend_list_model.dart';
+import 'package:sea_mates/strings.i18n.dart';
 
 class FriendView extends StatefulWidget {
   @override
@@ -11,7 +12,8 @@ class FriendView extends StatefulWidget {
 }
 
 class _FriendViewState extends State<FriendView> {
-  final String title = "Friends";
+  final String title = "Friends".i18n;
+  final DateFormat dateFormat = DateFormat.yMd(I18n.localeStr);
 
   Future<void> _requestFriendship(String username) async {
     var message = await Provider.of<FriendListModel>(context, listen: false)
@@ -20,7 +22,7 @@ class _FriendViewState extends State<FriendView> {
     if (message != null) {
       _showSnackbar(context, message);
     } else {
-      _showSnackbar(context, "Friendship requested!");
+      _showSnackbar(context, "Friendship requested!".i18n);
     }
   }
 
@@ -31,7 +33,7 @@ class _FriendViewState extends State<FriendView> {
     if (message != null) {
       _showSnackbar(context, message);
     } else {
-      _showSnackbar(context, "Friendship accepted!");
+      _showSnackbar(context, "Friendship accepted!".i18n);
     }
   }
 
@@ -44,7 +46,7 @@ class _FriendViewState extends State<FriendView> {
       if (message != null) {
         _showSnackbar(context, message);
       } else {
-        _showSnackbar(context, "Unfriended $username!");
+        _showSnackbar(context, "Unfriended $username!".i18n);
       }
     }
   }
@@ -77,7 +79,7 @@ class _FriendViewState extends State<FriendView> {
                       height: 10,
                     ),
                     Text(
-                      "Requests",
+                      "Requests".i18n,
                       textScaleFactor: 1.3,
                     ),
                     Divider(
@@ -135,7 +137,7 @@ class _FriendViewState extends State<FriendView> {
                       height: 10,
                     ),
                     Text(
-                      "Friends",
+                      "Friends".i18n,
                       textScaleFactor: 1.3,
                     ),
                     Divider(
@@ -196,8 +198,10 @@ class MyRequestCard extends StatelessWidget {
     return Card(
       child: ListTile(
         title: Text(req.targetName),
-        subtitle: Text(
-            '${req.targetUsername}\nRequested on ${DateFormat.yMd().format(req.timestamp)}'),
+        subtitle: Text('%s\nRequested on %s'.i18n.fill([
+          req.targetUsername,
+          DateFormat.yMd(I18n.localeStr).format(req.timestamp)
+        ]).i18n),
         isThreeLine: true,
       ),
     );
@@ -215,12 +219,14 @@ class OtherRequestCard extends StatelessWidget {
     return Card(
       child: ListTile(
         title: Text(req.sourceName),
-        subtitle: Text(
-            '${req.sourceUsername}\n${DateFormat.yMd().format(req.timestamp)}'),
+        subtitle: Text('%s\n%s'.i18n.fill([
+          req.sourceUsername,
+          DateFormat.yMd(I18n.localeStr).format(req.timestamp)
+        ])),
         isThreeLine: true,
         trailing: TextButton(
           onPressed: () => acceptCallback(req.sourceUsername),
-          child: Text('ACCEPT'),
+          child: Text('ACCEPT'.i18n),
         ),
       ),
     );
@@ -241,18 +247,18 @@ class FriendCard extends StatelessWidget {
             child: friend.isAvailable(DateTime.now())
                 ? Icon(
                     Icons.home,
-                    semanticLabel: 'On land',
+                    semanticLabel: 'On land'.i18n,
                   )
                 : Icon(
                     Icons.directions_boat,
-                    semanticLabel: "On sea",
+                    semanticLabel: "On sea".i18n,
                   )),
         title: Text(friend.user.name),
         subtitle: Text('${friend.user.username}\n${friend.user.email}'),
         trailing: IconButton(
             icon: Icon(
               Icons.cancel,
-              semanticLabel: 'Remove friendship',
+              semanticLabel: 'Remove friendship'.i18n,
             ),
             onPressed: () async => removeCallback(friend.user.username)),
         isThreeLine: true,
@@ -268,10 +274,10 @@ Future<String?> _showAddFriendDialog(BuildContext context) async {
       context: context,
       builder: (_) => AlertDialog(
             scrollable: true,
-            title: Text("Request friendship"),
+            title: Text("Request friendship".i18n),
             content: Column(
               children: [
-                Text('Type the username of the friend you want to add:'),
+                Text('Type the username of the friend you want to add:'.i18n),
                 TextFormField(
                   keyboardType: TextInputType.name,
                   textInputAction: TextInputAction.done,
@@ -288,11 +294,11 @@ Future<String?> _showAddFriendDialog(BuildContext context) async {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('CANCEL'),
+                child: Text('CANCEL'.i18n),
               ),
               TextButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: Text('REQUEST FRIENDSHIP'))
+                  child: Text('REQUEST FRIENDSHIP'.i18n))
             ],
           ));
 
@@ -307,17 +313,17 @@ Future<bool> _showUnfriendDialog(BuildContext context, String name) async {
   return await showDialog(
       context: context,
       builder: (_) => AlertDialog(
-            title: Text("Remove friendship"),
+            title: Text("Remove friendship".i18n),
             content: SingleChildScrollView(
-                child: Text('Are you sure you want to unfriend ${name}?')),
+                child: Text('Are you sure you want to unfriend ${name}?'.i18n)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('CANCEL'),
+                child: Text('CANCEL'.i18n),
               ),
               TextButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: Text('UNFRIEND'))
+                  child: Text('UNFRIEND'.i18n))
             ],
           ));
 }

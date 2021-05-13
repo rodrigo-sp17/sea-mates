@@ -5,6 +5,7 @@ import 'package:flutter_signin_button/button_view.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/model/user_model.dart';
+import 'package:sea_mates/strings.i18n.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -25,7 +26,7 @@ class WelcomePage extends StatelessWidget {
               ConstrainedBox(
                 constraints: BoxConstraints.tightFor(height: 45),
                 child: SignInButton(Buttons.Facebook,
-                    text: 'Continue with Facebook',
+                    text: 'Continue with Facebook'.i18n,
                     onPressed: () => Navigator.pushNamed(context, '/oauth2')),
               ),
               SizedBox(
@@ -35,7 +36,7 @@ class WelcomePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushNamed(context, '/login');
                   },
-                  child: Text("Login with email")),
+                  child: Text("Login with email".i18n)),
               Divider(
                 height: 20,
                 thickness: 0,
@@ -46,7 +47,7 @@ class WelcomePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushNamed(context, '/signup');
                   },
-                  child: Text("Signup")),
+                  child: Text("Signup".i18n)),
               Divider(
                 height: 20,
                 thickness: 0,
@@ -61,14 +62,14 @@ class WelcomePage extends StatelessWidget {
                         onPressed: () {
                           _showLocalUserDialog(context);
                         },
-                        child: Text("Continue offline"));
+                        child: Text("Continue offline".i18n));
                   case UserStatus.LOCAL:
                     return ElevatedButton(
                         style: ButtonStyle(
                             backgroundColor:
                                 MaterialStateProperty.all(Colors.grey)),
                         onPressed: () => Navigator.pushNamed(context, '/home'),
-                        child: Text("Remain in local mode"));
+                        child: Text("Remain in local mode".i18n));
                   case UserStatus.AUTH:
                     return ElevatedButton(
                       style: ButtonStyle(
@@ -87,7 +88,7 @@ class WelcomePage extends StatelessWidget {
               TextButton(
                 onPressed: () => launch(
                     Uri.https(ApiUtils.API_BASE, '/recovery').toString()),
-                child: Text('Forgot your password?'),
+                child: Text('Forgot your password?'.i18n),
               )
             ],
           ))),
@@ -99,21 +100,22 @@ void _showLocalUserDialog(BuildContext context) {
   showDialog(
       context: context,
       builder: (_) => AlertDialog(
-            title: Text("Entering in Local mode"),
+            title: Text("Entering in Local mode".i18n),
             content: SingleChildScrollView(
               child: Text('You are now going in local mode.\n\n'
-                  'In this mode, you will not be able to:\n'
-                  '- Add friends\n'
-                  '- View friends shifts\n'
-                  '- Invite friends to events\n'
-                  '- Sync with the cloud\n\n'
-                  'However, don\'t worry!\n'
-                  'You can add an account later and sync your shifts! :)'),
+                      'In this mode, you will not be able to:\n'
+                      '- Add friends\n'
+                      '- View friends shifts\n'
+                      '- Invite friends to events\n'
+                      '- Sync with the cloud\n\n'
+                      'However, don\'t worry!\n'
+                      'You can add an account later and sync your shifts! :)'
+                  .i18n),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('CANCEL'),
+                child: Text('CANCEL'.i18n),
               ),
               TextButton(
                   onPressed: () async {
@@ -124,7 +126,7 @@ void _showLocalUserDialog(BuildContext context) {
                       Navigator.pushNamedAndRemoveUntil(
                           context, '/home', (_) => false);
                   },
-                  child: Text('GOT IT!'))
+                  child: Text('GOT IT!'.i18n))
             ],
           ));
 }
@@ -136,7 +138,8 @@ void _showLogoutDialog(BuildContext context) {
             title: Text("Logout"),
             content: SingleChildScrollView(
               child: Text('Are you sure you want to logout?\n'
-                  'All your un-synced modifications will be discarded.'),
+                      'All your un-synced modifications will be discarded.'
+                  .i18n),
             ),
             actions: [
               TextButton(
@@ -148,7 +151,7 @@ void _showLogoutDialog(BuildContext context) {
                     await Provider.of<UserModel>(context, listen: false)
                         .logout();
                   },
-                  child: Text('YES, LOG ME OUT!'))
+                  child: Text('YES, LOG ME OUT!'.i18n))
             ],
           ));
 }

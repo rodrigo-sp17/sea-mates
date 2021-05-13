@@ -9,6 +9,7 @@ import 'package:sea_mates/exception/rest_exceptions.dart';
 import 'package:sea_mates/model/user_model.dart';
 import 'package:sea_mates/repository/shift_local_repository.dart';
 import 'package:sea_mates/repository/shift_remote_repository.dart';
+import 'package:sea_mates/strings.i18n.dart';
 
 class ShiftListModel extends ChangeNotifier {
   final _log = Logger('ShiftListModel');
@@ -46,7 +47,7 @@ class ShiftListModel extends ChangeNotifier {
     // - Save all UN-SYNCED data to local
 
     if (!_userModel.hasAuthentication()) {
-      return "Sync is unavailable in local mode";
+      return "Sync is unavailable in local mode".i18n;
     }
 
     _isLoading = true;
@@ -61,10 +62,10 @@ class ShiftListModel extends ChangeNotifier {
       localShifts = await _shiftLocalRepository.loadLocal();
       remoteShifts = await _shiftRemoteRepository.loadRemote(token);
     } on ForbiddenException {
-      errorMessage = 'Sync forbidden - please log in again';
+      errorMessage = 'Sync forbidden - please log in again'.i18n;
       _userModel.handleForbidden();
     } on RestException {
-      errorMessage = "Failed to fetch data";
+      errorMessage = "Failed to fetch data".i18n;
     }
 
     if (errorMessage != null) {
@@ -84,7 +85,7 @@ class ShiftListModel extends ChangeNotifier {
     } on Exception {
       _isLoading = false;
       notifyListeners();
-      return 'Failed to sync locally';
+      return 'Failed to sync locally'.i18n;
     }
 
     // Adds pending shifts to the server
@@ -159,7 +160,7 @@ class ShiftListModel extends ChangeNotifier {
     // for synced - requires online access
     if (synced.isNotEmpty) {
       if (!_userModel.hasAuthentication()) {
-        return 'Synced shifts cannot be deleted when in local mode';
+        return 'Synced shifts cannot be deleted when in local mode'.i18n;
       }
 
       var token = _userModel.getToken();
@@ -173,7 +174,7 @@ class ShiftListModel extends ChangeNotifier {
           var success = await _shiftRemoteRepository.removeRemote(id, token);
           if (success) removed.add(id);
         } on Exception {
-          errorMsg = "Some items could not be deleted";
+          errorMsg = "Some items could not be deleted".i18n;
         }
       }
 

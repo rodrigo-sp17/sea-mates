@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/sync_status.dart';
 import 'package:sea_mates/model/shift_list_model.dart';
+import 'package:sea_mates/strings.i18n.dart';
 import 'package:sea_mates/view/shift_add_view.dart';
 
 class ShiftView extends StatefulWidget {
@@ -11,6 +13,8 @@ class ShiftView extends StatefulWidget {
 }
 
 class _ShiftViewState extends State<ShiftView> {
+  final DateFormat dateFormat = DateFormat.yMd(I18n.localeStr);
+
   void _toggleSelectedLong(int shiftId) {
     var model = Provider.of<ShiftListModel>(context, listen: false);
     if (model.selectedIds.contains(shiftId)) {
@@ -41,7 +45,7 @@ class _ShiftViewState extends State<ShiftView> {
     if (message != null) {
       _showSnackbar(context, message);
     } else {
-      _showSnackbar(context, 'Deleted!');
+      _showSnackbar(context, 'Deleted!'.i18n);
     }
   }
 
@@ -66,7 +70,7 @@ class _ShiftViewState extends State<ShiftView> {
                   var selectedSize = model.selectedIds.length;
                   Widget? leading;
                   List<Widget> actions = [];
-                  String title = 'Shifts';
+                  String title = 'Shifts'.i18n;
 
                   if (selectedSize != 0) {
                     leading = IconButton(
@@ -109,10 +113,9 @@ class _ShiftViewState extends State<ShiftView> {
                         var id = shift.id!;
                         return ListTile(
                             title: Text(
-                              DateFormat.yMMMd()
-                                      .format(shift.unavailabilityStartDate) +
+                              dateFormat.format(shift.unavailabilityStartDate) +
                                   " ~ " +
-                                  DateFormat.yMMMd()
+                                  dateFormat
                                       .format(shift.unavailabilityEndDate),
                               textScaleFactor: 1.1,
                             ),

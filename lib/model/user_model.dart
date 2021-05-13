@@ -14,6 +14,7 @@ import 'package:sea_mates/exception/rest_exceptions.dart';
 import 'package:sea_mates/model/friend_list_model.dart';
 import 'package:sea_mates/model/shift_list_model.dart';
 import 'package:sea_mates/repository/user_repository.dart';
+import 'package:sea_mates/strings.i18n.dart';
 
 class UserModel extends ChangeNotifier {
   final log = Logger('UserModel');
@@ -74,9 +75,9 @@ class UserModel extends ChangeNotifier {
 
   String getToken() {
     if (_user == null) {
-      throw Exception("Not an auth user!");
+      throw Exception("Not an auth user!".i18n);
     } else if (_user!.isLocalUser()) {
-      throw Exception("User is local");
+      throw Exception("User is local".i18n);
     } else {
       return (_user as AuthenticatedUser).token;
     }
@@ -93,7 +94,8 @@ class UserModel extends ChangeNotifier {
         .post(uri, headers: headers, body: jsonEncode(user))
         .timeout(Duration(seconds: 15), onTimeout: () {
       throw TimeoutException(
-          'Could not connect to server. Please check your internet connection');
+          'Could not connect to server. Please check your internet connection'
+              .i18n);
     }).catchError((e) {
       log.warning(e);
       throw e;
@@ -110,7 +112,7 @@ class UserModel extends ChangeNotifier {
         answer = await socialLogin(token);
         break;
       case 400:
-        error = BadRequestException('Invalid data');
+        error = BadRequestException('Invalid data'.i18n);
         break;
       case 409:
         var body = response.body;
@@ -118,22 +120,23 @@ class UserModel extends ChangeNotifier {
         bool email = body.contains('email');
         String msg = "";
         if (username && email) {
-          msg = 'The username and email already exist';
+          msg = 'The username and email already exist'.i18n;
         } else if (username) {
-          msg = 'The username already exists';
+          msg = 'The username already exists'.i18n;
         } else {
-          msg = 'The email already exists';
+          msg = 'The email already exists'.i18n;
         }
         error = ConflictException(msg);
         break;
       case 500:
         log.severe('${response.headers}\n ${response.body}');
-        error = ServerException('Ops, something is wrong with the server!');
+        error =
+            ServerException('Ops, something is wrong with the server!'.i18n);
         break;
       default:
         log.warning(
             '${response.statusCode}: ${response.headers}\n ${response.body}');
-        error = ServerException('Ops, the server responded unexpectedly!');
+        error = ServerException('Ops, the server responded unexpectedly!'.i18n);
     }
 
     _loaded = true;
@@ -158,7 +161,8 @@ class UserModel extends ChangeNotifier {
       _loaded = true;
       notifyListeners();
       throw TimeoutException(
-          'Could not connect to server. Please check your internet connection');
+          'Could not connect to server. Please check your internet connection'
+              .i18n);
     });
 
     bool answer = false;
@@ -168,7 +172,7 @@ class UserModel extends ChangeNotifier {
         answer = true;
         break;
       case 400:
-        error = BadRequestException('Invalid data');
+        error = BadRequestException('Invalid data'.i18n);
         break;
       case 403:
         answer = false;
@@ -181,22 +185,23 @@ class UserModel extends ChangeNotifier {
         String msg = "";
 
         if (username && email) {
-          msg = 'The username and email already exist';
+          msg = 'The username and email already exist'.i18n;
         } else if (username) {
-          msg = 'The username already exists';
+          msg = 'The username already exists'.i18n;
         } else {
-          msg = 'The email already exists';
+          msg = 'The email already exists'.i18n;
         }
         error = ConflictException(msg);
         break;
       case 500:
         log.severe('${response.headers}\n ${response.body}');
-        error = ServerException('Ops, something is wrong with the server!');
+        error =
+            ServerException('Ops, something is wrong with the server!'.i18n);
         break;
       default:
         log.warning(
             '${response.statusCode}: ${response.headers}\n ${response.body}');
-        error = ServerException('Ops, the server responded unexpectedly!');
+        error = ServerException('Ops, the server responded unexpectedly!'.i18n);
     }
 
     _loaded = true;
@@ -233,7 +238,7 @@ class UserModel extends ChangeNotifier {
     }).timeout(Duration(seconds: 15), onTimeout: () {
       _loaded = true;
       notifyListeners();
-      throw TimeoutException('Request timed out');
+      throw TimeoutException('Request timed out'.i18n);
     }).catchError((e) {
       _loaded = true;
       notifyListeners();
@@ -250,13 +255,13 @@ class UserModel extends ChangeNotifier {
         answer = true;
         refreshOnlineData();
       } else {
-        error = "Failed to fetch user info";
+        error = "Failed to fetch user info".i18n;
       }
     } else if (response.statusCode == 403 || response.statusCode == 401) {
       handleForbidden();
       answer = false;
     } else {
-      error = "Something seem wrong with the server...";
+      error = "Something seem wrong with the server...".i18n;
     }
 
     _loaded = true;
@@ -332,15 +337,17 @@ class UserModel extends ChangeNotifier {
         answer = false;
         break;
       case 409:
-        error = ConflictException('Email already exists. Choose another one');
+        error =
+            ConflictException('Email already exists. Choose another one'.i18n);
         break;
       case 500:
         log.severe('${result.headers}\n ${result.body}');
-        error = ServerException('Oops...something is wrong with the server!');
+        error =
+            ServerException('Oops...something is wrong with the server!'.i18n);
         break;
       default:
         log.warning('${result.statusCode}: ${result.headers}\n ${result.body}');
-        error = ServerException('Ops, the server responded unexpectedly!');
+        error = ServerException('Ops, the server responded unexpectedly!'.i18n);
     }
 
     _loaded = true;
@@ -368,7 +375,8 @@ class UserModel extends ChangeNotifier {
       _loaded = true;
       notifyListeners();
       throw TimeoutException(
-          'Could not connect to server. Please check your internet connection');
+          'Could not connect to server. Please check your internet connection'
+              .i18n);
     }).catchError((e) {
       log.warning(e);
       _loaded = true;
@@ -389,7 +397,7 @@ class UserModel extends ChangeNotifier {
       default:
         log.warning(
             '${response.statusCode}: ${response.headers}\n ${response.body}');
-        error = ServerException('Ops, the server responded unexpectedly!');
+        error = ServerException('Ops, the server responded unexpectedly!'.i18n);
     }
 
     _loaded = true;

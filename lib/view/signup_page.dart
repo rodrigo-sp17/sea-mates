@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sea_mates/strings.i18n.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/user_request.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
@@ -44,26 +45,26 @@ class _SignupFormState extends State<SignupForm> {
     await result.then(
       (success) async {
         if (success) {
-          await _showDialog(
-              "Signup success!", "Please login to confirm your registration");
+          await _showDialog("Signup success!",
+              "Please login to confirm your registration".i18n);
           Navigator.pushReplacementNamed(context, '/login');
         } else {
-          _showDialog("Unauthorized", "You are not authorized to signup");
+          _showDialog("Unauthorized", "You are not authorized to signup".i18n);
         }
       },
     ).catchError((e) {
       if (e is RestException) {
-        _showDialog("Signup failed", e.message);
+        _showDialog("Signup failed".i18n, e.message);
       }
     });
   }
 
   String? _validateConfirmPassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Password confirmation is mandatory';
+      return 'Password confirmation is mandatory'.i18n;
     }
     if (value != request.password) {
-      return 'Confirm password does not match password';
+      return 'Confirm password does not match password'.i18n;
     }
   }
 
@@ -83,7 +84,8 @@ class _SignupFormState extends State<SignupForm> {
                 keyboardType: TextInputType.name,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
-                    icon: const Icon(Icons.person_outline), labelText: 'Name'),
+                    icon: const Icon(Icons.person_outline),
+                    labelText: 'Name'.i18n),
                 autofillHints: [
                   AutofillHints.name,
                 ],
@@ -97,7 +99,7 @@ class _SignupFormState extends State<SignupForm> {
                 keyboardType: TextInputType.name,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
-                    icon: const Icon(Icons.person), labelText: 'Username'),
+                    icon: const Icon(Icons.person), labelText: 'Username'.i18n),
                 autofillHints: [
                   AutofillHints.username,
                 ],
@@ -111,7 +113,8 @@ class _SignupFormState extends State<SignupForm> {
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
-                    icon: const Icon(Icons.person_outline), labelText: 'Email'),
+                    icon: const Icon(Icons.person_outline),
+                    labelText: 'Email'.i18n),
                 autofillHints: [
                   AutofillHints.email,
                 ],
@@ -127,7 +130,7 @@ class _SignupFormState extends State<SignupForm> {
                 obscureText: hidePassword,
                 decoration: InputDecoration(
                     icon: const Icon(Icons.security),
-                    labelText: 'Password',
+                    labelText: 'Password'.i18n,
                     suffixIcon: IconButton(
                       icon: hidePassword
                           ? Icon(Icons.visibility)
@@ -153,7 +156,7 @@ class _SignupFormState extends State<SignupForm> {
                 obscureText: hidePassword,
                 decoration: InputDecoration(
                   icon: Icon(Icons.check),
-                  labelText: 'Confirm Password',
+                  labelText: 'Confirm Password'.i18n,
                 ),
                 autofillHints: [AutofillHints.password],
                 validator: _validateConfirmPassword,
@@ -171,7 +174,7 @@ class _SignupFormState extends State<SignupForm> {
                         style: ButtonStyle(),
                         onPressed: _submit,
                         child: Text(
-                          'SIGNUP',
+                          'SIGNUP'.i18n,
                           textScaleFactor: 1.2,
                         ));
                   } else {

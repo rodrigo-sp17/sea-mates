@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:sea_mates/strings.i18n.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/data/social_user.dart';
@@ -45,12 +46,12 @@ class _OAuthViewState extends State<OAuthView> {
       if (success) {
         await Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
       } else {
-        await _showFailureDialog(
-            context, 'Login failed', 'Could not fetch user information');
+        await _showFailureDialog(context, 'Login failed'.i18n,
+            'Could not fetch user information'.i18n);
       }
     }).catchError((e) async {
-      await _showFailureDialog(context, 'Login failed',
-          'Sorry, something went wrong. Please try again!');
+      await _showFailureDialog(context, 'Login failed'.i18n,
+          'Sorry, something went wrong. Please try again!'.i18n);
     });
     await Navigator.pushNamedAndRemoveUntil(
         context, '/welcome', (route) => false);

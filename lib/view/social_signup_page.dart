@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sea_mates/strings.i18n.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/social_user.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
@@ -50,12 +51,12 @@ class _SignupFormState extends State<SocialSignupForm> {
         if (success) {
           Navigator.pushReplacementNamed(context, '/home');
         } else {
-          _showDialog("Unauthorized", "You are not authorized to signup");
+          _showDialog("Unauthorized", "You are not authorized to signup".i18n);
         }
       },
     ).catchError((e) {
       if (e is RestException) {
-        _showDialog("Signup failed", e.message);
+        _showDialog("Signup failed".i18n, e.message);
       }
     });
   }
@@ -77,7 +78,8 @@ class _SignupFormState extends State<SocialSignupForm> {
                 keyboardType: TextInputType.name,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
-                    icon: const Icon(Icons.person_outline), labelText: 'Name'),
+                    icon: const Icon(Icons.person_outline),
+                    labelText: 'Name'.i18n),
                 autofillHints: [
                   AutofillHints.name,
                 ],
@@ -91,7 +93,7 @@ class _SignupFormState extends State<SocialSignupForm> {
                 keyboardType: TextInputType.name,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
-                    icon: const Icon(Icons.person), labelText: 'Username'),
+                    icon: const Icon(Icons.person), labelText: 'Username'.i18n),
                 autofillHints: [
                   AutofillHints.username,
                 ],
@@ -106,7 +108,8 @@ class _SignupFormState extends State<SocialSignupForm> {
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
-                    icon: const Icon(Icons.person_outline), labelText: 'Email'),
+                    icon: const Icon(Icons.person_outline),
+                    labelText: 'Email'.i18n),
                 autofillHints: [
                   AutofillHints.email,
                 ],
@@ -125,7 +128,7 @@ class _SignupFormState extends State<SocialSignupForm> {
                         style: ButtonStyle(),
                         onPressed: _submit,
                         child: Text(
-                          'SIGNUP',
+                          'SIGNUP'.i18n,
                           textScaleFactor: 1.2,
                         ));
                   } else {
