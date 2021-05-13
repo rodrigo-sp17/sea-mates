@@ -42,13 +42,8 @@ class DayView extends StatelessWidget {
                   future: model.fetchAvailableFriends(date),
                   builder: (context, AsyncSnapshot<List<Friend>?> snapshot) {
                     if (snapshot.hasData) {
-                      var friends = snapshot.data;
-                      if (friends == null) {
-                        return SliverToBoxAdapter(
-                            child: Center(
-                                child:
-                                    Text('Not available in local mode'.i18n)));
-                      } else if (friends.isEmpty) {
+                      var friends = snapshot.data!;
+                      if (friends.isEmpty) {
                         return SliverToBoxAdapter(
                             child: Center(
                                 child: Text('No friends available'.i18n)));
@@ -74,6 +69,10 @@ class DayView extends StatelessWidget {
                               child: Text(
                                   'Error loading friends! Please, try again!'
                                       .i18n)));
+                    } else if (snapshot.data == null) {
+                      return SliverToBoxAdapter(
+                          child: Center(
+                              child: Text('Not available in local mode'.i18n)));
                     } else {
                       return SliverFillRemaining(
                           child: Center(

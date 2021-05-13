@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/widgets.dart';
-import 'package:sea_mates/strings.i18n.dart';
 import 'package:logging/logging.dart';
 import 'package:sea_mates/data/auth_user.dart';
 import 'package:sea_mates/data/friend.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
 import 'package:sea_mates/model/user_model.dart';
 import 'package:sea_mates/repository/impl/friends_web_client.dart';
+import 'package:sea_mates/strings.i18n.dart';
 
 class FriendListModel extends ChangeNotifier {
   final log = Logger('FriendListModel');
