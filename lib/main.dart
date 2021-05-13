@@ -14,11 +14,12 @@ import 'package:sea_mates/repository/impl/friends_web_client.dart';
 import 'package:sea_mates/repository/impl/shift_hive_repository.dart';
 import 'package:sea_mates/repository/impl/shift_web_client.dart';
 import 'package:sea_mates/repository/impl/user_hive_repo.dart';
-import 'package:sea_mates/view/home.dart';
+import 'package:sea_mates/view/home_page.dart';
 import 'package:sea_mates/view/login_page.dart';
 import 'package:sea_mates/view/oauth_view.dart';
 import 'package:sea_mates/view/signup_page.dart';
 import 'package:sea_mates/view/social_signup_page.dart';
+import 'package:sea_mates/view/splash_page.dart';
 import 'package:sea_mates/view/welcome_page.dart';
 
 import 'model/shift_list_model.dart';
@@ -79,15 +80,7 @@ class MyApp extends StatelessWidget {
                             MaterialStateProperty.all(Size.fromHeight(45)),
                         textStyle: MaterialStateProperty.all(TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold))))),
-            home: I18n(child: Consumer<UserModel>(
-              builder: (context, model, child) {
-                if (model.userStatus != UserStatus.ANONYMOUS) {
-                  return HomePage();
-                } else {
-                  return WelcomePage();
-                }
-              },
-            )),
+            home: I18n(child: SplashPage()),
             routes: {
               '/welcome': (context) => WelcomePage(),
               '/home': (context) => HomePage(),

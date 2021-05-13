@@ -46,6 +46,7 @@ class UserModel extends ChangeNotifier {
 
   Future<void> load() async {
     _loaded = false;
+    notifyListeners();
     try {
       _user = await userRepository.loadUser();
       _userStatus = _user!.isLocalUser() ? UserStatus.LOCAL : UserStatus.AUTH;
