@@ -11,6 +11,9 @@ import 'package:sea_mates/strings.i18n.dart';
 import '../validators.dart';
 
 class ProfileView extends StatefulWidget {
+  const ProfileView(this.defaultActions);
+  final List<Widget> defaultActions;
+
   @override
   State<StatefulWidget> createState() => _ProfileViewState();
 }
@@ -29,6 +32,7 @@ class _ProfileViewState extends State<ProfileView> {
     _usernameController.text = "username";
     _nameController.text = "Name Surname";
     _emailController.text = "email@domain.com";
+    actions = widget.defaultActions;
   }
 
   @override
@@ -93,7 +97,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   void _submitChanges() async {
     setState(() {
-      actions = [];
+      actions = widget.defaultActions;
     });
 
     await Provider.of<UserModel>(context, listen: false)

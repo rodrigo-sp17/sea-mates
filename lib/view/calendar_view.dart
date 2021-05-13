@@ -11,6 +11,9 @@ import 'package:sea_mates/view/shift_add_view.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarView extends StatefulWidget {
+  const CalendarView(this.defaultActions);
+  final List<Widget> defaultActions;
+
   @override
   State<StatefulWidget> createState() => _CalendarState();
 }
@@ -60,6 +63,7 @@ class _CalendarState extends State<CalendarView> {
               automaticallyImplyLeading: false,
               title: Text('Calendar'.i18n),
               pinned: true,
+              actions: widget.defaultActions,
             ),
             Consumer<ShiftListModel>(
                 builder: (context, model, child) {

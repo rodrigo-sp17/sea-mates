@@ -7,6 +7,9 @@ import 'package:sea_mates/model/friend_list_model.dart';
 import 'package:sea_mates/strings.i18n.dart';
 
 class FriendView extends StatefulWidget {
+  const FriendView(this.defaultActions);
+  final List<Widget> defaultActions;
+
   @override
   State<StatefulWidget> createState() => _FriendViewState();
 }
@@ -71,6 +74,7 @@ class _FriendViewState extends State<FriendView> {
                 automaticallyImplyLeading: false,
                 title: Text(title),
                 pinned: true,
+                actions: widget.defaultActions,
               ),
               SliverToBoxAdapter(
                 child: Column(

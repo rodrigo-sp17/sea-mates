@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
+import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/model/user_model.dart';
 import 'package:sea_mates/strings.i18n.dart';
 import 'package:sea_mates/view/calendar_view.dart';
 import 'package:sea_mates/view/profile_view.dart';
 import 'package:sea_mates/view/shift_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'friend_view.dart';
+
+enum Menu { ABOUT }
 
 class HomePage extends StatefulWidget {
   @override
@@ -14,21 +19,97 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Widget> offlineChildren = [CalendarView(), ShiftView(), ProfileView()];
-  List<Widget> offlineTabs = [
-    Tab(
-      icon: Icon(Icons.today),
-      text: 'Calendar'.i18n,
-    ),
-    Tab(
-      icon: Icon(Icons.work),
-      text: 'Shifts'.i18n,
-    ),
-    Tab(
-      icon: Icon(Icons.person),
-      text: 'Profile'.i18n,
-    ),
-  ];
+  final String websiteLink = Uri.https(ApiUtils.API_BASE, "").toString();
+
+  late List<Widget> defaultActions = [];
+
+  PackageInfo _packageInfo = PackageInfo(
+      appName: 'Unknown',
+      packageName: 'Unknown',
+      version: 'Unknown',
+      buildNumber: 'Unknown');
+
+  late List<Widget> offlineChildren;
+  late List<Widget> offlineTabs;
+
+  @override
+  void initState() {
+    super.initState();
+    _initPackageInfo();
+
+    defaultActions = [
+      PopupMenuButton(
+        onSelected: (value) {
+          switch (value) {
+            case Menu.ABOUT:
+              _showAboutDialog();
+          }
+        },
+        itemBuilder: (context) =>
+            [PopupMenuItem<Menu>(value: Menu.ABOUT, child: Text("About".i18n))],
+      )
+    ];
+
+    offlineChildren = [
+      CalendarView(defaultActions),
+      ShiftView(defaultActions),
+      ProfileView(defaultActions)
+    ];
+    offlineTabs = [
+      Tab(
+        icon: Icon(Icons.today),
+        text: 'Calendar'.i18n,
+      ),
+      Tab(
+        icon: Icon(Icons.work),
+        text: 'Shifts'.i18n,
+      ),
+      Tab(
+        icon: Icon(Icons.person),
+        text: 'Profile'.i18n,
+      ),
+    ];
+  }
+
+  Future<void> _initPackageInfo() async {
+    final PackageInfo info = await PackageInfo.fromPlatform();
+    setState(() {
+      _packageInfo = info;
+    });
+  }
+
+  void _showAboutDialog() {
+    final TextStyle textStyle = Theme.of(context).textTheme.bodyText2!;
+
+    showAboutDialog(
+      context: context,
+      applicationName: _packageInfo.appName,
+      applicationVersion: _packageInfo.version,
+      applicationLegalese: '\u{a9} 2021 Rodrigo Silva dev.rodrigosp@gmail.com',
+      children: [
+        const SizedBox(
+          height: 20,
+        ),
+        RichText(
+          text: TextSpan(children: [
+            TextSpan(
+                style: textStyle,
+                text: 'SeaMates is an app for monitoring your work shifts,'
+                        ' sharing with friends and easily checking who is available.\n\n'
+                    .i18n),
+            TextSpan(style: textStyle, text: 'Online website at '.i18n),
+          ]),
+        ),
+        InkWell(
+          child: Text(
+            websiteLink,
+            style: textStyle.copyWith(color: Colors.blue),
+          ),
+          onTap: () => launch(websiteLink),
+        )
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +119,12 @@ class _HomePageState extends State<HomePage> {
         List<Widget> tabs = [];
 
         if (model.hasAuthentication()) {
-          children = [CalendarView(), ShiftView(), FriendView(), ProfileView()];
+          children = [
+            CalendarView(defaultActions),
+            ShiftView(defaultActions),
+            FriendView(defaultActions),
+            ProfileView(defaultActions)
+          ];
           tabs = [
             Tab(
               icon: Icon(Icons.today),

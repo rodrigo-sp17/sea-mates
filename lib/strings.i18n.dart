@@ -9,6 +9,14 @@ extension Localization on String {
         "fr": "Salut, comment ca va?",
         "de": "Hallo, wie geht es dir?",
       } +
+      {"en_us": "About", "pt_br": "Sobre"} +
+      {
+        "en_us": 'SeaMates is an app for monitoring your work shifts,'
+            ' sharing with friends and easily checking who is available.\n\n',
+        "pt_br":
+            'SeaMates é um app para monitorar suas escalas de trabalho, compartilhar com amigos e checar quem está disponível.\n\n'
+      } +
+      {"en_us": 'Online website at ', "pt_br": 'Versão web em '} +
       {"en_us": "'%s\nRequested on %s'", "pt_br": "%s\nSolicitado em %s"} +
       {"en_us": "Day %s", "pt_br": "Dia %s"} +
       {"en_us": "Not an auth user!", "pt_br": "Você não está logado!"} +

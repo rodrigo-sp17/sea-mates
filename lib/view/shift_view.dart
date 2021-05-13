@@ -8,6 +8,8 @@ import 'package:sea_mates/strings.i18n.dart';
 import 'package:sea_mates/view/shift_add_view.dart';
 
 class ShiftView extends StatefulWidget {
+  const ShiftView(this.defaultActions);
+  final List<Widget> defaultActions;
   @override
   State<StatefulWidget> createState() => _ShiftViewState();
 }
@@ -69,7 +71,7 @@ class _ShiftViewState extends State<ShiftView> {
                 builder: (context, model, child) {
                   var selectedSize = model.selectedIds.length;
                   Widget? leading;
-                  List<Widget> actions = [];
+                  List<Widget> actions = widget.defaultActions;
                   String title = 'Shifts'.i18n;
 
                   if (selectedSize != 0) {
