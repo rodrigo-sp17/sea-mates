@@ -1,14 +1,14 @@
 <p align="center">
-<img src="assets/icon.png"/>
+<img height="150" src="assets/icon.png"/>
 </p>
 
 # SeaMates
-![Badge](https://img.shields.io/github/license/rodrigo-sp17/sea-mates)
 ![Badge](https://img.shields.io/github/v/release/rodrigo-sp17/sea-mates)
 ![Badge](https://img.shields.io/github/last-commit/rodrigo-sp17/sea-mates)
 ![Badge](https://img.shields.io/github/issues/rodrigo-sp17/sea-mates)
 
 A work shift monitoring and sharing app. Never forget when you have to go. Know who will be there when you come back!
+
 
 ## Motivation
 
@@ -21,13 +21,15 @@ In the age of social networks, SeaMates is an app attempting to close this gap. 
 shifts, you always know when your friends are around or not. Also, when planning for an event, it will show you everyone
 who will be available, allowing you to choose a day when everybody can gather together and not be missed.
 
+
 ## Installation
 ### Building from source
-- 1) Install [flutter](https://flutter.dev/docs/get-started/install) and necessary dependencies.
-- 2) `git clone https://github.com/rodrigo-sp17/sea-mates.git`
-- 3) cd into project repository
-- 4) `flutter pub get`
-- 5) `flutter run`
+- 1.1) Install [Flutter](https://flutter.dev/docs/get-started/install) and necessary dependencies.
+- 1.2) `git clone https://github.com/rodrigo-sp17/sea-mates.git`
+- 1.3) cd into project repository
+- 1.4) `flutter pub get`
+- 1.5) `flutter run`
+
 
 ## Features
 - [x] Facebook login
@@ -36,6 +38,7 @@ who will be available, allowing you to choose a day when everybody can gather to
 - [ ] Events
 - [ ] Friend profile view
 - [ ] Notifications
+
 
 ## Tech Stack
 - [Flutter](https://flutter.dev/)
