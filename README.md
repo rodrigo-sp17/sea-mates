@@ -1,16 +1,53 @@
-# sea_mates
+<p align="center">
+<img src="assets/icon.png"/>
+</p>
 
-A new Flutter project.
+# SeaMates
+![Badge](https://img.shields.io/github/license/rodrigo-sp17/sea-mates)
+![Badge](https://img.shields.io/github/v/release/rodrigo-sp17/sea-mates)
+![Badge](https://img.shields.io/github/last-commit/rodrigo-sp17/sea-mates)
+![Badge](https://img.shields.io/github/issues/rodrigo-sp17/sea-mates)
 
-## Getting Started
+A work shift monitoring and sharing app. Never forget when you have to go. Know who will be there when you come back!
 
-This project is a starting point for a Flutter application.
+## Motivation
 
-A few resources to get you started if this is your first Flutter project:
+It is very easy for offshore workers, seafarers, aircraft pilots, and many other people who work for days away
+from home to lose touch with their family and friends. More often than not, many of these friends also work on similar
+conditions, so it is usually very difficult to schedule events where people who matter to you will be available. With
+time, this difficulty may bring people apart, as many can tell.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+In the age of social networks, SeaMates is an app attempting to close this gap. By adding friends and registering your
+shifts, you always know when your friends are around or not. Also, when planning for an event, it will show you everyone
+who will be available, allowing you to choose a day when everybody can gather together and not be missed.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Installation
+### Building from source
+- 1) Install [flutter](https://flutter.dev/docs/get-started/install) and necessary dependencies.
+- 2) `git clone https://github.com/rodrigo-sp17/sea-mates.git`
+- 3) cd into project repository
+- 4) `flutter pub get`
+- 5) `flutter run`
+
+## Features
+- [x] Facebook login
+- [x] Requesting, accepting and deleting friendships
+- [x] Shift calendar
+- [ ] Events
+- [ ] Friend profile view
+- [ ] Notifications
+
+## Tech Stack
+- [Flutter](https://flutter.dev/)
+- [Dart](https://dart.dev/)
+- [Provider](https://pub.dev/packages/provider)
+- [Hive](https://pub.dev/packages/hive)
+- [Logging](https://pub.dev/packages/logging) 
+- [TableCalendar](https://pub.dev/packages/table_calendar)
+- [Flutter Signin Button](https://pub.dev/packages/flutter_signin_button)
+- [URL Launcher](https://pub.dev/packages/url_launcher)
+- [WebView](https://pub.dev/packages/webview_flutter)
+- [i18n Extension](https://pub.dev/packages/i18n_extension)
+
+## License
+[GPL-3.0 License](https://github.com/rodrigo-sp17/sea-mates/COPYING)
