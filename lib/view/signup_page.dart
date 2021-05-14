@@ -4,7 +4,7 @@ import 'package:sea_mates/data/user_request.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
 import 'package:sea_mates/model/user_model.dart';
 import 'package:sea_mates/strings.i18n.dart';
-import 'package:sea_mates/validators.dart';
+import 'package:sea_mates/util/validators.dart';
 
 class SignupPage extends StatelessWidget {
   @override

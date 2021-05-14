@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
-import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/data/auth_user.dart';
 import 'package:sea_mates/data/local_user.dart';
 import 'package:sea_mates/data/social_user.dart';
@@ -15,6 +14,7 @@ import 'package:sea_mates/model/friend_list_model.dart';
 import 'package:sea_mates/model/shift_list_model.dart';
 import 'package:sea_mates/repository/user_repository.dart';
 import 'package:sea_mates/strings.i18n.dart';
+import 'package:sea_mates/util/api_utils.dart';
 
 class UserModel extends ChangeNotifier {
   final log = Logger('UserModel');

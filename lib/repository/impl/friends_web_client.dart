@@ -5,7 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:sea_mates/data/friend.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
 
-import '../../api_utils.dart';
+import '../../util/api_utils.dart';
 
 class FriendsWebClient {
   static const String _base = ApiUtils.API_BASE;

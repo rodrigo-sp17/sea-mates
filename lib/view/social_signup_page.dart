@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:sea_mates/strings.i18n.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/data/social_user.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
 import 'package:sea_mates/model/user_model.dart';
-import 'package:sea_mates/validators.dart';
+import 'package:sea_mates/strings.i18n.dart';
+import 'package:sea_mates/util/validators.dart';
 
 class SocialSignupPage extends StatelessWidget {
   @override

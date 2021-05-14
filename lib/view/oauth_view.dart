@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:sea_mates/strings.i18n.dart';
 import 'package:provider/provider.dart';
-import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/data/social_user.dart';
 import 'package:sea_mates/model/user_model.dart';
+import 'package:sea_mates/strings.i18n.dart';
+import 'package:sea_mates/util/api_utils.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class OAuthView extends StatefulWidget {

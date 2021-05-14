@@ -8,7 +8,7 @@ import 'package:sea_mates/exception/rest_exceptions.dart';
 import 'package:sea_mates/model/user_model.dart';
 import 'package:sea_mates/strings.i18n.dart';
 
-import '../validators.dart';
+import '../util/validators.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView(this.defaultActions);

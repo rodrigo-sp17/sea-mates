@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
-import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/data/shift.dart';
 import 'package:sea_mates/data/sync_status.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
+import 'package:sea_mates/util/api_utils.dart';
 
 import '../shift_remote_repository.dart';
 

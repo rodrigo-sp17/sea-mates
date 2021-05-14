@@ -5,9 +5,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:provider/provider.dart';
-import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/model/user_model.dart';
 import 'package:sea_mates/strings.i18n.dart';
+import 'package:sea_mates/util/api_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WelcomePage extends StatelessWidget {

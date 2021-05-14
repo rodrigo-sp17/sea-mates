@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
-import 'package:sea_mates/api_utils.dart';
 import 'package:sea_mates/model/user_model.dart';
 import 'package:sea_mates/strings.i18n.dart';
+import 'package:sea_mates/util/api_utils.dart';
 import 'package:sea_mates/view/calendar_view.dart';
 import 'package:sea_mates/view/profile_view.dart';
 import 'package:sea_mates/view/shift_view.dart';

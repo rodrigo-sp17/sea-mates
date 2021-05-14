@@ -42,11 +42,11 @@ void main() async {
   friendListModel.update(userModel);
   userModel.update(shiftListModel, friendListModel);
 
-  runApp(MyApp(userModel, shiftListModel, friendListModel));
+  runApp(SeaMatesApp(userModel, shiftListModel, friendListModel));
 }
 
-class MyApp extends StatelessWidget {
-  MyApp(this.userModel, this.shiftListModel, this.friendListModel);
+class SeaMatesApp extends StatelessWidget {
+  SeaMatesApp(this.userModel, this.shiftListModel, this.friendListModel);
   final UserModel userModel;
   final ShiftListModel shiftListModel;
   final FriendListModel friendListModel;
@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
               const Locale('es', ''),
             ],
             navigatorKey: userModel.navigatorKey,
-            title: 'Flutter Demo',
+            title: 'SeaMates',
             theme: ThemeData(
                 primaryColor: Color(0xff064273),
                 primaryColorLight: Color(0xff456da2),
