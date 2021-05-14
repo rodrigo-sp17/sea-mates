@@ -244,7 +244,6 @@ class _ShiftFormState extends State<StatefulWidget> {
     int? days = int.tryParse(_cycleDaysController.text);
     if (days != null) {
       DateTime? boarding = _parseDate(_boardDateController.text);
-      DateTime? unStartDate = _parseDate(_unStartDateController.text);
       if (boarding != null) {
         DateTime leaving = boarding.add(Duration(days: days));
         DateTime unEnd = leaving;

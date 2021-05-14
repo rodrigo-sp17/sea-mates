@@ -9,6 +9,10 @@ extension Localization on String {
         "fr": "Salut, comment ca va?",
         "de": "Hallo, wie geht es dir?",
       } +
+      {
+        "en_us": "Are you sure you want to unfriend %s?",
+        "pt_br": "Desfazer amizade com %s?"
+      } +
       {"en_us": "About", "pt_br": "Sobre"} +
       {
         "en_us": 'SeaMates is an app for monitoring your work shifts,'

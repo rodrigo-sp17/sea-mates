@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
 import 'package:sea_mates/data/shift.dart';
 import 'package:sea_mates/data/sync_status.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
@@ -12,8 +11,6 @@ import 'package:sea_mates/repository/shift_remote_repository.dart';
 import 'package:sea_mates/strings.i18n.dart';
 
 class ShiftListModel extends ChangeNotifier {
-  final _log = Logger('ShiftListModel');
-
   // Dependencies
   final ShiftRemoteRepository _shiftRemoteRepository;
   final ShiftLocalRepository _shiftLocalRepository;

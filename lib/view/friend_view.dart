@@ -319,7 +319,8 @@ Future<bool> _showUnfriendDialog(BuildContext context, String name) async {
       builder: (_) => AlertDialog(
             title: Text("Remove friendship".i18n),
             content: SingleChildScrollView(
-                child: Text('Are you sure you want to unfriend ${name}?'.i18n)),
+                child: Text(
+                    'Are you sure you want to unfriend %s?'.i18n.fill([name]))),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
