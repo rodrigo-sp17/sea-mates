@@ -72,118 +72,128 @@ class _SignupFormState extends State<SignupForm> {
   Widget build(BuildContext context) {
     return Form(
         key: _formKey,
-        child: Scrollbar(
-          child: ListView(
-            padding: EdgeInsets.all(20),
-            children: [
-              SizedBox(
-                height: 150,
-              ),
-              TextFormField(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                keyboardType: TextInputType.name,
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(
-                    icon: const Icon(Icons.person_outline),
-                    labelText: 'Name'.i18n),
-                autofillHints: [
-                  AutofillHints.name,
+        child: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                  Theme.of(context).primaryColor,
+                  Theme.of(context).accentColor
+                ])),
+            child: Scrollbar(
+              child: ListView(
+                padding: EdgeInsets.all(20),
+                children: [
+                  SizedBox(
+                    height: 150,
+                  ),
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType: TextInputType.name,
+                    textInputAction: TextInputAction.next,
+                    decoration: InputDecoration(
+                        icon: const Icon(Icons.person_outline),
+                        labelText: 'Name'.i18n),
+                    autofillHints: [
+                      AutofillHints.name,
+                    ],
+                    validator: Validators.validateName,
+                    onSaved: (value) {
+                      request.name = value!;
+                    },
+                  ),
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType: TextInputType.name,
+                    textInputAction: TextInputAction.next,
+                    decoration: InputDecoration(
+                        icon: const Icon(Icons.person),
+                        labelText: 'Username'.i18n),
+                    autofillHints: [
+                      AutofillHints.username,
+                    ],
+                    validator: Validators.validateUsername,
+                    onSaved: (value) {
+                      request.username = value!;
+                    },
+                  ),
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    decoration: InputDecoration(
+                        icon: const Icon(Icons.person_outline),
+                        labelText: 'Email'.i18n),
+                    autofillHints: [
+                      AutofillHints.email,
+                    ],
+                    validator: Validators.validateEmail,
+                    onSaved: (value) {
+                      request.email = value!;
+                    },
+                  ),
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType: TextInputType.visiblePassword,
+                    textInputAction: TextInputAction.next,
+                    obscureText: hidePassword,
+                    decoration: InputDecoration(
+                        icon: const Icon(Icons.security),
+                        labelText: 'Password'.i18n,
+                        suffixIcon: IconButton(
+                          icon: hidePassword
+                              ? Icon(Icons.visibility)
+                              : Icon(Icons.visibility_off),
+                          onPressed: _togglePasswordVisible,
+                        )),
+                    autofillHints: [AutofillHints.password],
+                    validator: Validators.validatePassword,
+                    onChanged: (value) {
+                      request.password = value;
+                    },
+                    onFieldSubmitted: (value) {
+                      request.password = value;
+                    },
+                    onSaved: (value) {
+                      request.password = value!;
+                    },
+                  ),
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType: TextInputType.visiblePassword,
+                    textInputAction: TextInputAction.next,
+                    obscureText: hidePassword,
+                    decoration: InputDecoration(
+                      icon: Icon(Icons.check),
+                      labelText: 'Confirm Password'.i18n,
+                    ),
+                    autofillHints: [AutofillHints.password],
+                    validator: _validateConfirmPassword,
+                    onSaved: (value) {
+                      request.confirmPassword = value!;
+                    },
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Consumer<UserModel>(
+                    builder: (context, model, child) {
+                      if (model.loaded) {
+                        return ElevatedButton(
+                            style: ButtonStyle(),
+                            onPressed: _submit,
+                            child: Text(
+                              'SIGNUP'.i18n,
+                            ));
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  ),
                 ],
-                validator: Validators.validateName,
-                onSaved: (value) {
-                  request.name = value!;
-                },
               ),
-              TextFormField(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                keyboardType: TextInputType.name,
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(
-                    icon: const Icon(Icons.person), labelText: 'Username'.i18n),
-                autofillHints: [
-                  AutofillHints.username,
-                ],
-                validator: Validators.validateUsername,
-                onSaved: (value) {
-                  request.username = value!;
-                },
-              ),
-              TextFormField(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(
-                    icon: const Icon(Icons.person_outline),
-                    labelText: 'Email'.i18n),
-                autofillHints: [
-                  AutofillHints.email,
-                ],
-                validator: Validators.validateEmail,
-                onSaved: (value) {
-                  request.email = value!;
-                },
-              ),
-              TextFormField(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                keyboardType: TextInputType.visiblePassword,
-                textInputAction: TextInputAction.next,
-                obscureText: hidePassword,
-                decoration: InputDecoration(
-                    icon: const Icon(Icons.security),
-                    labelText: 'Password'.i18n,
-                    suffixIcon: IconButton(
-                      icon: hidePassword
-                          ? Icon(Icons.visibility)
-                          : Icon(Icons.visibility_off),
-                      onPressed: _togglePasswordVisible,
-                    )),
-                autofillHints: [AutofillHints.password],
-                validator: Validators.validatePassword,
-                onChanged: (value) {
-                  request.password = value;
-                },
-                onFieldSubmitted: (value) {
-                  request.password = value;
-                },
-                onSaved: (value) {
-                  request.password = value!;
-                },
-              ),
-              TextFormField(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                keyboardType: TextInputType.visiblePassword,
-                textInputAction: TextInputAction.next,
-                obscureText: hidePassword,
-                decoration: InputDecoration(
-                  icon: Icon(Icons.check),
-                  labelText: 'Confirm Password'.i18n,
-                ),
-                autofillHints: [AutofillHints.password],
-                validator: _validateConfirmPassword,
-                onSaved: (value) {
-                  request.confirmPassword = value!;
-                },
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              Consumer<UserModel>(
-                builder: (context, model, child) {
-                  if (model.loaded) {
-                    return ElevatedButton(
-                        style: ButtonStyle(),
-                        onPressed: _submit,
-                        child: Text(
-                          'SIGNUP'.i18n,
-                        ));
-                  } else {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                },
-              ),
-            ],
-          ),
-        ));
+            )));
   }
 
   Future _showDialog(String title, String failedMessage) {

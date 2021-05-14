@@ -14,8 +14,20 @@ class SplashPage extends StatelessWidget {
       if (!model.loaded) {
         return Scaffold(
           body: Container(
-            child: Center(child: Text('logo placeholder')),
-          ),
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                    Theme.of(context).primaryColor,
+                    Theme.of(context).accentColor
+                  ])),
+              child: Center(
+                child: Image(
+                  height: 200,
+                  image: AssetImage('assets/icon.png'),
+                ),
+              )),
         );
       } else if (model.userStatus != UserStatus.ANONYMOUS) {
         return HomePage();

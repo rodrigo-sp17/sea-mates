@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.sea_mates">
    <application
-        android:label="sea_mates"
+        android:label="SeaMates"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

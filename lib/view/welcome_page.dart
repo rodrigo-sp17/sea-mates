@@ -29,9 +29,27 @@ class WelcomePage extends StatelessWidget {
                   child: ListView(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                 children: [
-                  SizedBox(
-                    height: 220,
-                    child: Text('Logo placeholder'),
+                  Padding(
+                    padding: EdgeInsets.only(top: 80),
+                    child: Center(
+                        child: Image(
+                      height: 100,
+                      image: AssetImage('assets/icon.png'),
+                    )),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 10, bottom: 50),
+                    child: Center(
+                      child: Text(
+                        'SeaMates',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: Theme.of(context)
+                                .accentTextTheme
+                                .headline3!
+                                .fontSize),
+                      ),
+                    ),
                   ),
                   ConstrainedBox(
                     constraints: BoxConstraints.tightFor(height: 45),

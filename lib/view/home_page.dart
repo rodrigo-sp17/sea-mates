@@ -83,6 +83,10 @@ class _HomePageState extends State<HomePage> {
 
     showAboutDialog(
       context: context,
+      applicationIcon: Image(
+        height: 70,
+        image: AssetImage('assets/icon.png'),
+      ),
       applicationName: _packageInfo.appName,
       applicationVersion: _packageInfo.version,
       applicationLegalese: '\u{a9} 2021 Rodrigo Silva dev.rodrigosp@gmail.com',
