@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> {
         height: 70,
         image: AssetImage('assets/icon.png'),
       ),
-      applicationName: _packageInfo.appName,
+      applicationName: 'SeaMates',
       applicationVersion: _packageInfo.version,
       applicationLegalese: '\u{a9} 2021 Rodrigo Silva dev.rodrigosp@gmail.com',
       children: [
