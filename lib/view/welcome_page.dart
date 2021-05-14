@@ -2,8 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_signin_button/button_list.dart';
-import 'package:flutter_signin_button/button_view.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:sea_mates/model/user_model.dart';
 import 'package:sea_mates/strings.i18n.dart';
@@ -51,15 +50,13 @@ class WelcomePage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(height: 45),
-                    child: SignInButton(Buttons.Facebook,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5))),
-                        text: 'Continue with Facebook'.i18n,
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/oauth2')),
-                  ),
+                  ElevatedButton.icon(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Color(0xFF1877F2))),
+                      icon: Icon(FontAwesomeIcons.facebookF),
+                      label: Text('Continue with Facebook'.i18n),
+                      onPressed: () => Navigator.pushNamed(context, '/oauth2')),
                   SizedBox(
                     height: 15,
                   ),

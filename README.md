@@ -47,7 +47,6 @@ who will be available, allowing you to choose a day when everybody can gather to
 - [Hive](https://pub.dev/packages/hive)
 - [Logging](https://pub.dev/packages/logging) 
 - [TableCalendar](https://pub.dev/packages/table_calendar)
-- [Flutter Signin Button](https://pub.dev/packages/flutter_signin_button)
 - [URL Launcher](https://pub.dev/packages/url_launcher)
 - [WebView](https://pub.dev/packages/webview_flutter)
 - [i18n Extension](https://pub.dev/packages/i18n_extension)

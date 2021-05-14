@@ -40,16 +40,17 @@ dependencies:
   json_annotation: ^4.0.1
   logging: ^1.0.1
   webview_flutter: ^2.0.4
-  flutter_signin_button: ^2.0.0
   url_launcher: ^6.0.3
   i18n_extension: ^4.0.3
   package_info: ^2.0.0
+  mockito: ^5.0.7
+  font_awesome_flutter: ^9.0.0
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  #build_runner: ^2.0.2
+  build_runner: ^1.9.0
   #hive_generator: ^1.1.0
   #json_serializable: ^4.1.1
 

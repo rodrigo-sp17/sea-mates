@@ -46,10 +46,12 @@ void main() async {
 }
 
 class SeaMatesApp extends StatelessWidget {
-  SeaMatesApp(this.userModel, this.shiftListModel, this.friendListModel);
+  SeaMatesApp(this.userModel, this.shiftListModel, this.friendListModel,
+      {this.navigatorObservers = const []});
   final UserModel userModel;
   final ShiftListModel shiftListModel;
   final FriendListModel friendListModel;
+  final List<NavigatorObserver> navigatorObservers;
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +62,7 @@ class SeaMatesApp extends StatelessWidget {
           ChangeNotifierProvider.value(value: friendListModel)
         ],
         child: MaterialApp(
+            navigatorObservers: navigatorObservers,
             localizationsDelegates: [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
