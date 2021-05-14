@@ -3,6 +3,7 @@
 </p>
 
 # SeaMates
+![Badge](https://img.shields.io/github/workflow/status/rodrigo-sp17/sea-mates/Build%20APK)
 ![Badge](https://img.shields.io/github/v/release/rodrigo-sp17/sea-mates)
 ![Badge](https://img.shields.io/github/last-commit/rodrigo-sp17/sea-mates)
 ![Badge](https://img.shields.io/github/issues/rodrigo-sp17/sea-mates)
