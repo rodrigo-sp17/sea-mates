@@ -93,7 +93,7 @@ class UserModel extends ChangeNotifier {
     var headers = {"content-type": "application/json"};
     var response = await http
         .post(uri, headers: headers, body: jsonEncode(user))
-        .timeout(Duration(seconds: 15), onTimeout: () {
+        .timeout(Duration(minutes: 2), onTimeout: () {
       throw TimeoutException(
           'Could not connect to server. Please check your internet connection'
               .i18n);
@@ -158,7 +158,7 @@ class UserModel extends ChangeNotifier {
     var headers = {"content-type": "application/json"};
     var response = await http
         .post(uri, headers: headers, body: jsonEncode(request))
-        .timeout(Duration(seconds: 15), onTimeout: () {
+        .timeout(Duration(minutes: 2), onTimeout: () {
       _loaded = true;
       notifyListeners();
       throw TimeoutException(
@@ -236,7 +236,7 @@ class UserModel extends ChangeNotifier {
     Map<String, String> body = {"username": username, "password": password};
     var response = await http.post(uri, body: jsonEncode(body), headers: {
       "content-type": "application/json"
-    }).timeout(Duration(seconds: 15), onTimeout: () {
+    }).timeout(Duration(minutes: 2), onTimeout: () {
       _loaded = true;
       notifyListeners();
       throw TimeoutException('Request timed out'.i18n);
@@ -318,7 +318,7 @@ class UserModel extends ChangeNotifier {
               'content-type': 'application/json'
             },
             body: jsonEncode(body))
-        .timeout(Duration(seconds: 15))
+        .timeout(Duration(minutes: 2))
         .catchError((e) {
       log.warning(e);
       _loaded = true;
@@ -372,7 +372,7 @@ class UserModel extends ChangeNotifier {
     };
     var response = await http
         .delete(uri, headers: headers)
-        .timeout(Duration(seconds: 15), onTimeout: () {
+        .timeout(Duration(minutes: 2), onTimeout: () {
       _loaded = true;
       notifyListeners();
       throw TimeoutException(

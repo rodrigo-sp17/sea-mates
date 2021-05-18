@@ -12,7 +12,7 @@ import '../shift_remote_repository.dart';
 class ShiftWebClient implements ShiftRemoteRepository {
   static const String _base = ApiUtils.API_BASE;
   static const String _path = '/api/shift';
-  static const _timeout = Duration(seconds: 15);
+  static const _timeout = Duration(minutes: 2);
 
   final _log = Logger("ShiftWebClient");
 

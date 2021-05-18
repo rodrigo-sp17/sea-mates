@@ -10,7 +10,7 @@ import '../../util/api_utils.dart';
 class FriendsWebClient {
   static const String _base = ApiUtils.API_BASE;
   static const _path = '/api/friend';
-  static const _timeout = Duration(seconds: 15);
+  static const _timeout = Duration(minutes: 2);
 
   final log = Logger('FriendsWebClient');
 
