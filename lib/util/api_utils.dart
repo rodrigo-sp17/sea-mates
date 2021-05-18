@@ -1,3 +1,3 @@
 class ApiUtils {
-  static const String API_BASE = "agendamaritima.herokuapp.com";
+  static const String API_BASE = "seamates.herokuapp.com";
 }
