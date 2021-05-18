@@ -3,12 +3,20 @@
 </p>
 
 # SeaMates
-![Badge](https://img.shields.io/github/workflow/status/rodrigo-sp17/sea-mates/Build%20APK)
-![Badge](https://img.shields.io/github/v/release/rodrigo-sp17/sea-mates)
 ![Badge](https://img.shields.io/github/last-commit/rodrigo-sp17/sea-mates)
 ![Badge](https://img.shields.io/github/issues/rodrigo-sp17/sea-mates)
+![Badge](https://img.shields.io/tokei/lines/github/rodrigo-sp17/sea-mates)
+![Badge](https://img.shields.io/github/license/rodrigo-sp17/sea-mates)
+
 
 A work shift monitoring and sharing app. Never forget when you have to go. Know who will be there when you come back!
+
+
+<p align="center">
+  <img width="250" style="border-radius: 5px" height="450" src="docs/screenshots/WelcomePreview.png" alt="Welcome">
+  <img width="250" style="border-radius: 5px" height="450" src="docs/screenshots/CalendarPreview.png" alt="Calendar">
+  <img width="250" style="border-radius: 5px" height="450" src="docs/screenshots/ShiftPreview.png" alt="Shift">
+</p>
 
 
 ## Motivation
@@ -31,14 +39,16 @@ who will be available, allowing you to choose a day when everybody can gather to
 - 1.4) `flutter pub get`
 - 1.5) `flutter run`
 
+### From PlayStore
+Currently, the PlayStore version is in internal testing. 1.0.0 will be released soon! :)
+
 
 ## Features
-- [x] Facebook login
-- [x] Requesting, accepting and deleting friendships
-- [x] Shift calendar
-- [ ] Events
-- [ ] Friend profile view
-- [ ] Notifications
+- Requesting, accepting and deleting friendships
+- Shift calendar
+- Offline shifts - add when you need, sync when you can
+- Facebook login
+- Offline mode for a simple shift keeping experience
 
 
 ## Tech Stack
@@ -51,6 +61,13 @@ who will be available, allowing you to choose a day when everybody can gather to
 - [URL Launcher](https://pub.dev/packages/url_launcher)
 - [WebView](https://pub.dev/packages/webview_flutter)
 - [i18n Extension](https://pub.dev/packages/i18n_extension)
+
+
+## Contributing
+Since this is also a study project, contributions are always appreciated!
+
+Feel free to fork, open an issue or submit a pull request. You may also send suggestions to my e-mail!
+
 
 ## License
 [GPL-3.0 License](https://github.com/rodrigo-sp17/sea-mates/COPYING)
