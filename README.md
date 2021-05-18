@@ -5,7 +5,6 @@
 # SeaMates
 ![Badge](https://img.shields.io/github/last-commit/rodrigo-sp17/sea-mates)
 ![Badge](https://img.shields.io/github/issues/rodrigo-sp17/sea-mates)
-![Badge](https://img.shields.io/tokei/lines/github/rodrigo-sp17/sea-mates)
 ![Badge](https://img.shields.io/github/license/rodrigo-sp17/sea-mates)
 
 
