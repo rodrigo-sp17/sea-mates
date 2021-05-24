@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:sea_mates/data/friend.dart';
 import 'package:sea_mates/model/friend_list_model.dart';
 import 'package:sea_mates/strings.i18n.dart';
+import 'package:sea_mates/view/friend_profile_view.dart';
 
 class FriendView extends StatefulWidget {
   const FriendView(this.defaultActions);
@@ -52,6 +53,12 @@ class _FriendViewState extends State<FriendView> {
         _showSnackbar(context, "Unfriended $username!".i18n);
       }
     }
+  }
+
+  Future<void> _openFriendView(Friend friend) async {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => FriendProfileView(friend),
+        fullscreenDialog: true));
   }
 
   Future<void> _refresh() async {
@@ -168,7 +175,8 @@ class _FriendViewState extends State<FriendView> {
                             delegate: SliverChildBuilderDelegate(
                                 (context, int index) {
                               var friend = friends[index];
-                              return FriendCard(friend, _removeFriendship);
+                              return FriendCard(
+                                  friend, _removeFriendship, _openFriendView);
                             }, childCount: friends.length),
                           );
                   }
@@ -238,9 +246,10 @@ class OtherRequestCard extends StatelessWidget {
 }
 
 class FriendCard extends StatelessWidget {
-  const FriendCard(this.friend, this.removeCallback);
+  const FriendCard(this.friend, this.removeCallback, this.tapCallback);
   final Friend friend;
   final Function(String) removeCallback;
+  final Function(Friend) tapCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -259,6 +268,7 @@ class FriendCard extends StatelessWidget {
                   )),
         title: Text(friend.user.name),
         subtitle: Text('${friend.user.username}\n${friend.user.email}'),
+        onTap: () => tapCallback(friend),
         trailing: IconButton(
             icon: Icon(
               Icons.cancel,

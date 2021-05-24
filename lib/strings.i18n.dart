@@ -9,6 +9,8 @@ extension Localization on String {
         "fr": "Salut, comment ca va?",
         "de": "Hallo, wie geht es dir?",
       } +
+      {"en_us": "Personal Data", "pt_br": "Dados Pessoais"} +
+      {"en_us": "%s Profile", "pt_br": "Perfil de %s"} +
       {
         "en_us": "Are you sure you want to unfriend %s?",
         "pt_br": "Desfazer amizade com %s?"

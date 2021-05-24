@@ -5,10 +5,17 @@ import 'package:provider/provider.dart';
 import 'package:sea_mates/data/friend.dart';
 import 'package:sea_mates/model/friend_list_model.dart';
 import 'package:sea_mates/strings.i18n.dart';
+import 'package:sea_mates/view/friend_profile_view.dart';
 
 class DayView extends StatelessWidget {
   const DayView(this.date);
   final DateTime date;
+
+  Future<void> _openFriendView(BuildContext context, Friend friend) async {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => FriendProfileView(friend),
+        fullscreenDialog: true));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +65,7 @@ class DayView extends StatelessWidget {
                                 subtitle: Text(
                                     '${friend.user.username}\n${friend.user.email}'),
                                 isThreeLine: true,
+                                onTap: () => _openFriendView(context, friend),
                               ),
                             );
                           }, childCount: friends.length),
