@@ -9,6 +9,7 @@ import 'package:sea_mates/data/auth_user.dart';
 import 'package:sea_mates/data/shift.dart';
 import 'package:sea_mates/data/sync_status.dart';
 import 'package:sea_mates/model/friend_list_model.dart';
+import 'package:sea_mates/model/notification_model.dart';
 import 'package:sea_mates/model/user_model.dart';
 import 'package:sea_mates/repository/impl/friends_web_client.dart';
 import 'package:sea_mates/repository/impl/shift_hive_repository.dart';
@@ -39,18 +40,23 @@ void main() async {
   var shiftListModel = ShiftListModel(ShiftWebClient(), ShiftHiveRepository());
   shiftListModel.update(userModel);
   var friendListModel = FriendListModel(FriendsWebClient());
+  var notificationModel = NotificationModel();
+  notificationModel.update(userModel);
   friendListModel.update(userModel);
-  userModel.update(shiftListModel, friendListModel);
+  userModel.update(shiftListModel, friendListModel, notificationModel);
 
-  runApp(SeaMatesApp(userModel, shiftListModel, friendListModel));
+  runApp(SeaMatesApp(
+      userModel, shiftListModel, friendListModel, notificationModel));
 }
 
 class SeaMatesApp extends StatelessWidget {
   SeaMatesApp(this.userModel, this.shiftListModel, this.friendListModel,
+      this.notificationModel,
       {this.navigatorObservers = const []});
   final UserModel userModel;
   final ShiftListModel shiftListModel;
   final FriendListModel friendListModel;
+  final NotificationModel notificationModel;
   final List<NavigatorObserver> navigatorObservers;
 
   @override
@@ -59,7 +65,8 @@ class SeaMatesApp extends StatelessWidget {
         providers: [
           ChangeNotifierProvider.value(value: userModel),
           ChangeNotifierProvider.value(value: shiftListModel),
-          ChangeNotifierProvider.value(value: friendListModel)
+          ChangeNotifierProvider.value(value: friendListModel),
+          ChangeNotifierProvider.value(value: notificationModel),
         ],
         child: MaterialApp(
             navigatorObservers: navigatorObservers,

@@ -11,6 +11,7 @@ import 'package:sea_mates/data/user.dart';
 import 'package:sea_mates/data/user_request.dart';
 import 'package:sea_mates/exception/rest_exceptions.dart';
 import 'package:sea_mates/model/friend_list_model.dart';
+import 'package:sea_mates/model/notification_model.dart';
 import 'package:sea_mates/model/shift_list_model.dart';
 import 'package:sea_mates/repository/user_repository.dart';
 import 'package:sea_mates/strings.i18n.dart';
@@ -23,6 +24,7 @@ class UserModel extends ChangeNotifier {
   final UserRepository userRepository;
   late ShiftListModel shiftListModel;
   late FriendListModel friendListModel;
+  late NotificationModel _notificationModel;
   final GlobalKey<NavigatorState> navigatorKey =
       new GlobalKey<NavigatorState>();
 
@@ -30,9 +32,11 @@ class UserModel extends ChangeNotifier {
     load();
   }
 
-  void update(ShiftListModel shiftListModel, FriendListModel friendListModel) {
+  void update(ShiftListModel shiftListModel, FriendListModel friendListModel,
+      NotificationModel notificationModel) {
     this.shiftListModel = shiftListModel;
     this.friendListModel = friendListModel;
+    _notificationModel = notificationModel;
   }
 
   // State
@@ -62,6 +66,7 @@ class UserModel extends ChangeNotifier {
   void refreshOnlineData() {
     shiftListModel.syncShifts();
     friendListModel.refresh();
+    _notificationModel.subscribe();
   }
 
   bool hasAuthentication() {
