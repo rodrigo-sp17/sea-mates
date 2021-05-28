@@ -11,6 +11,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:sea_mates/main.dart';
 import 'package:sea_mates/model/friend_list_model.dart';
+import 'package:sea_mates/model/notification_model.dart';
 import 'package:sea_mates/model/shift_list_model.dart';
 import 'package:sea_mates/model/user_model.dart';
 import 'package:sea_mates/repository/impl/friends_web_client.dart';
@@ -44,14 +45,17 @@ void main() {
     var shiftListModel =
         ShiftListModel(MockShiftWebClient(), ShiftHiveRepository());
     var friendListModel = FriendListModel(MockFriendsWebClient());
+    var notificationModel = NotificationModel();
     shiftListModel.update(userModel);
     friendListModel.update(userModel);
-    userModel.update(shiftListModel, friendListModel);
+    notificationModel.update(userModel);
+    userModel.update(shiftListModel, friendListModel, notificationModel);
 
     final app = SeaMatesApp(
       userModel,
       shiftListModel,
       friendListModel,
+      notificationModel,
       navigatorObservers: [mockObserver],
     );
     await tester.pumpWidget(app);

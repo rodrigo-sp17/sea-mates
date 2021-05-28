@@ -16,6 +16,7 @@ class NotificationModel extends ChangeNotifier {
   }
 
   // State
+  bool _isSubscribed = false;
 
   // Actions
   Future<void> subscribe() async {
@@ -36,21 +37,22 @@ class NotificationModel extends ChangeNotifier {
       request.headers["Authorization"] = token;
 
       var response = await _client.send(request);
-      response.stream.toStringStream().listen((value) {
-        print(_parseEvent(value)); // TODO - handle events
-      });
+      if (response.statusCode == 200) {
+        _isSubscribed = true;
+        response.stream.toStringStream().listen((value) {
+          //var json = _parseEvent(value);
+          print('called');
+          print(value); // TODO - handle events
+          //print(json["data"]);
+        });
+      } else {
+        _isSubscribed = false;
+      }
+
+      notifyListeners();
+      return;
     } on Exception {
       // TODO
     }
-  }
-
-  Map<String, String> _parseEvent(String data) {
-    var parts = data.split("\n");
-    var eventPair = parts[0].split(":");
-    var dataPair = parts[1].split(":");
-    if (parts[1].isEmpty) {
-      dataPair = ["data", ""];
-    }
-    return {eventPair[0]: eventPair[1], dataPair[0]: dataPair[1]};
   }
 }
