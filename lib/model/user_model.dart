@@ -53,7 +53,12 @@ class UserModel extends ChangeNotifier {
     notifyListeners();
     try {
       _user = await userRepository.loadUser();
-      _userStatus = _user!.isLocalUser() ? UserStatus.LOCAL : UserStatus.AUTH;
+      if (_user!.isLocalUser()) {
+        _userStatus = UserStatus.LOCAL;
+      } else {
+        _userStatus = UserStatus.AUTH;
+        refreshOnlineData();
+      }
     } on UserNotFoundException {
       _user = null;
       _userStatus = UserStatus.ANONYMOUS;
@@ -293,6 +298,7 @@ class UserModel extends ChangeNotifier {
     await shiftListModel.clearLocalDatabase();
     await userRepository.dropUser();
     await friendListModel.clearState();
+    _notificationModel.unsubscribe();
     _userStatus = UserStatus.ANONYMOUS;
     _user = null;
     notifyListeners();

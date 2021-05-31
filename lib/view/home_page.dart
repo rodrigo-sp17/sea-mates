@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
+import 'package:sea_mates/model/notification_model.dart';
 import 'package:sea_mates/model/user_model.dart';
 import 'package:sea_mates/strings.i18n.dart';
 import 'package:sea_mates/util/api_utils.dart';
 import 'package:sea_mates/view/calendar_view.dart';
+import 'package:sea_mates/view/notification_view.dart';
 import 'package:sea_mates/view/profile_view.dart';
 import 'package:sea_mates/view/shift_view.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -38,6 +40,22 @@ class _HomePageState extends State<HomePage> {
     _initPackageInfo();
 
     defaultActions = [
+      Consumer<NotificationModel>(builder: (context, model, child) {
+        if (model.isSubscribed) {
+          return IconButton(
+              icon: Icon(model.newNotifications > 0
+                  ? Icons.notifications_active
+                  : Icons.notifications_none),
+              onPressed: () {
+                model.clearNewNotifications();
+                Navigator.of(context).push(MaterialPageRoute(
+                    fullscreenDialog: true,
+                    builder: (context) => NotificationView()));
+              });
+        } else {
+          return SizedBox.shrink();
+        }
+      }),
       PopupMenuButton(
         onSelected: (value) {
           switch (value) {

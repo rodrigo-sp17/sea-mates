@@ -50,7 +50,7 @@ class _FriendViewState extends State<FriendView> {
       if (message != null) {
         _showSnackbar(context, message);
       } else {
-        _showSnackbar(context, "Unfriended $username!".i18n);
+        _showSnackbar(context, "Unfriended %s!".i18n.fill([username]));
       }
     }
   }

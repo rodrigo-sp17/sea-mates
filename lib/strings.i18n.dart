@@ -9,11 +9,25 @@ extension Localization on String {
         "fr": "Salut, comment ca va?",
         "de": "Hallo, wie geht es dir?",
       } +
+      {"en_us": "Notifications", "pt_br": "Notificações"} +
       {"en_us": "Personal Data", "pt_br": "Dados Pessoais"} +
+      {
+        "en_us": "No notifications to show",
+        "pt_br": "Nenhuma notificação para exibir"
+      } +
       {"en_us": "%s Profile", "pt_br": "Perfil de %s"} +
       {
         "en_us": "Are you sure you want to unfriend %s?",
         "pt_br": "Desfazer amizade com %s?"
+      } +
+      {"en_us": "Unfriended %s!", "pt_br": "Desfeita amizade com %s!"} +
+      {
+        "en_us": "%s requested your friendship!",
+        "pt_br": "%s solicitou sua amizade!"
+      } +
+      {
+        "en_us": "%s accepted your friendship request!",
+        "pt_br": "%s aceitou sua amizade!"
       } +
       {"en_us": "About", "pt_br": "Sobre"} +
       {
