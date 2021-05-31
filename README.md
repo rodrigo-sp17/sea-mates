@@ -48,6 +48,7 @@ Currently, the PlayStore version is in internal testing. 1.0.0 will be released 
 - Offline shifts - add when you need, sync when you can
 - Facebook login
 - Offline mode for a simple shift keeping experience
+- Push notifications - always be aware of your friends actions!
 
 
 ## Tech Stack
